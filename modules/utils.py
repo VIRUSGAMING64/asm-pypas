@@ -1,7 +1,7 @@
 import mimetypes
 import flask
 
-def read(path, mode = "r"):
+def read(path, mode = "rb"):
     file = open(path,mode)
     data = file.read(2**30)
     file.close()
@@ -36,3 +36,4 @@ def cleanStr(s: str) -> str:
     while s.endswith(" "):
         s = s.removesuffix(" ")
     return s
+

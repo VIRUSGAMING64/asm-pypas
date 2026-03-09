@@ -12,7 +12,7 @@ for name in cods:
         continue
     codes[name] = data
 
-app   = flask.Flask("INTERPRETER")
+app   = flask.Flask("app")
 ROOT  = os.path.realpath("./gui")
 saver = CodeSaver("codes/")
 
@@ -21,12 +21,12 @@ def run():
     code = flask.request.args.get("code", "")
     name = flask.request.args.get("name", "")
     print("running code...")
-    
+    code = code.encode()
     if code != codes[name]:
         codes[name] = code
-        saver.save(name,code)
+        saver.save(name,code.decode())
 
-    exe = Executor(code)
+    exe = Executor(code.decode())
     out = exe.run()
     print(out)
     return out,200
@@ -36,9 +36,10 @@ def run():
 def save(): 
     code = flask.request.args.get("code", "")
     name = flask.request.args.get("name", "")
+    code = code.encode()
     if code != codes.get(name):
         codes[name] = code
-        saver.save(name,code)
+        saver.save(name,code.decode())
 
     return {"status":"ok"},200
 
@@ -46,7 +47,8 @@ def save():
 @app.route("/getcode")
 def sendCode():
     name = flask.request.args.get("name", "")
-    return {"status":"ok","code":codes.get(name, "")},200
+    cod = codes.get(name, b"").decode()
+    return {"status":"ok","code":cod},200
 
 
 @app.route("/")
@@ -65,7 +67,7 @@ def getcodes():
     name = flask.request.args.get("name", "")
     return {
         "status":"ok",
-        "code"  : codes.get(name, "")
+        "code"  : codes.get(name, b"").decode()
     }
 
 @app.route("/initcodes")
@@ -75,7 +77,7 @@ def initcodes():
     for name in os.listdir("codes"):
         code = read("codes/"+name)
         if code == "":
-            continue``
+            continue
         
         cods.append(name)
         
@@ -99,5 +101,15 @@ def newcode():
     }
     codes[name] = ""
     return res,200
+
+@app.route("/delcode")
+def delcode():
+    file = flask.request.args.get("name")
+    file.replace("..", "")
+    try:
+        os.remove(os.path.abspath("./codes/")+"/"+file)
+    except Exception as e:
+        print(e)
+    return {"status":"ok"}
 
 app.run("0.0.0.0", 9000)

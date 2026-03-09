@@ -1,6 +1,5 @@
 from modules.utils import *
 from modules.t_statics import *
-from .types import *
 
 def Tokenize(code):
 
@@ -34,19 +33,20 @@ def Tokenize(code):
             if p: 
                 pos += 1
                 continue
-        
-            if toks[len(toks) + dis].expr.isnumeric():
-                toks[len(toks) + dis].type = NUMBER
-            elif toks[len(toks) + dis].expr.startswith("\"") and toks[len(toks) + dis].expr.endswith("\""):
-                toks[len(toks) + dis].type = STRING
-            elif toks[len(toks) + dis].expr.startswith("'") and toks[len(toks) + dis].expr.endswith("'"):
-                toks[len(toks) + dis].type = STRING
-            elif toks[len(toks) + dis].isKeyword():
-                toks[len(toks) + dis].type = KEYWORD
-            elif toks[len(toks) + dis].isLabel():
-                toks[len(toks) + dis].type = LABEL
-            elif toks[len(toks) + dis].expr.isalnum():
-                toks[len(toks) + dis].type = VARIABLES
+            t_obj = toks[len(toks) + dis]
+            le = len(t_obj.expr)
+            if t_obj.expr.isnumeric():
+                t_obj.type = NUMBER
+            elif t_obj.expr.startswith("\"") and t_obj.expr.endswith("\"") and le > 1:
+                t_obj.type = STRING
+            elif t_obj.expr.startswith("'") and t_obj.expr.endswith("'") and le > 1:
+                t_obj.type = STRING
+            elif t_obj.isKeyword():
+                t_obj.type = KEYWORD
+            elif t_obj.isLabel():
+                t_obj.type = LABEL
+            elif t_obj.expr.isalnum():
+                t_obj.type = VARIABLES
             
             act_tok = ""
 
@@ -58,13 +58,15 @@ def Tokenize(code):
         line:Token = toks[i]
         if line.type == NIL:
             splited_tokens = line.getErrs()
+            print(splited_tokens)
             for t in splited_tokens:
-                line_tokens.append(t[0])
+                try:
+                    line_tokens.append(t[0])
+                except Exception as e:
+                    print(e)
         else:
             line_tokens.append(line)
     return line_tokens
-
-
 
 class Token:
     def __init__(self,expr, type = NIL, tokens = None):
@@ -91,6 +93,7 @@ class Token:
         
         if len(self.expr) == 1:
             return [[Token(self.expr[0],INVALID)]]
+    
         arr = []
         for x in self.expr:
             arr.append(Tokenize(x))

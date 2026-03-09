@@ -1,45 +1,32 @@
-.coder{
-    width: 50%;
-    height: 100%;
-}
-
-.code{
-    align-items: center;
-    padding: 0%;
-    border-color: rgb(29, 14, 55);
-    background-color: rgb(44, 42, 42);
-    text-align:start;
-    color: white;   
-}   
-
-.submitter{
-    background-color: rgb(39, 36, 36);
-    border-color: black;
-    color: white;
-    width: 50%;
-    height: 30px;
-}
-
-.output{
-    color:white;
-    width: 50%;
-    height: 100%;
-    
+@font-face {
+    font-family: "google-sans";
+    src: url("/gui/lib/google-sans.ttf");
 }
 
 
-.body{
-    background-color: rgb(0, 0, 0);
-    align-items: center;
+*{
+    font-family: "google-sans";
 }
 
-
-
-
+button{
+    cursor: pointer;
+}
 .saves{
-    color: rgb(216, 216, 255);
-    background-color: rgb(53, 9, 60);
-    font-family: monospace;
-    font-size: 20px;
+    margin-left: 4px;
+    margin-right: 4px;
+    padding: 4px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius:5px;
+    font-size: large;
+    background: #52339c3b;
+    scrollbar-base-color: transparent;
+}
+.saves::-webkit-scrollbar{
+    display: none;
+}
 
+.CodeMirror.cm-s-dracula{
+    padding-top: 20px;
+    height: 100%;
 }

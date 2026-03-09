@@ -1,34 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Document</title>
-        <link rel="stylesheet" href="/gui/lib/codemirror/codemirror.min.css">
-        <link rel="stylesheet" href="/gui/lib/codemirror/dracula.min.css">
-        <script src="/gui/lib/codemirror/codemirror.min.js"></script>
-        <script src="/gui/lib/codemirror/python.min.js"></script>
-    </head>
 
-    <body class="body">
-        
-        <table id="saves">
-            <button class = "new" onclick="NewCode()">New</button>
-            <button class = "del">delete</button>
-        </table>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interpreter</title>
+    <link rel="icon" type="image/svg+xml" href="/gui/favicon.svg">
+    <link rel="stylesheet" href="/gui/lib/codemirror/codemirror.min.css">
+    <link rel="stylesheet" href="/gui/lib/codemirror/dracula.min.css">
+    <link rel="stylesheet" href="/gui/styles.css">
+    <link rel="stylesheet" href="/gui/lib/iconfont/material-icons.css">
+    <script src="/gui/lib/codemirror/codemirror.min.js"></script>
+    <script src="/gui/lib/codemirror/go.min.js"></script>
+    <script src="/gui/lib/tailwind.js"></script>
+</head>
 
-        <div class = "MainContainer">        
-            <link rel="stylesheet" href="/gui/styles.css">
-            <textarea id="writer" name="code" class="code"></textarea>                        
+<body class="bg-gray-950 text-white overflow-hidden w-screen h-screen l-0 r-0">
+
+    <div class="flex items-center bg-slate-200/5 h-14">
+        <div class="flex w-full pl-3 pr-3">
+            <div class="flex w-full">
+                <div id="saves" class="flex"></div>
+                <div class="flex justify-center items-center">
+                    <button class="text-3xl" onclick="NewCode()">
+                        <span class="material-icons-round">add</span>
+                    </button>
+                </div>
+            </div>
+            <div class="flex justify-center items-center">
+                <button class="" onclick="delcurr()">
+                    <span class="material-icons-round">
+                        delete
+                    </span>
+                </button>
+            </div>
         </div>
+    </div>
 
-        <div>
-            <button onclick='submitCode("run")' class = "submitter">Submit</button>
-            <label1 class="output">
-                out:
-            </label>
+    <div class="flex flex-col h-full">
+        <div class="code-out flex h-4/5">
+            <div class="coder w-full">
+                <textarea id="writer" name="code" class="code"></textarea>
+            </div>
+
+            <div class="out-run w-0">
+                <button onclick='submitCode("run")' class="rounded-full hover:bg-black/20 h-10 w-10 text-3xl">
+                    <span class="material-icons-round translate-x-[-2.5rem] scale-150">chevron_right</span>
+                </button>
+
+            </div>
+
         </div>
+        <div class="overflow-scroll output h-1/5 bg-neutral-900/80 p-4" style="font-family: monospace;"></div>
+    </div>
 
-        <script src="/gui/main.js"></script>
-    </body>
+</body>
+
 </html>
+
+<script src="/gui/main.js"></script>
