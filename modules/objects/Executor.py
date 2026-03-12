@@ -60,9 +60,13 @@ class Executor:
                 pass
             elif line.tokens[0].expr == "func":
                 func,i = self.func(i,lines)
-                if func != None:
-                    mem.alloc_func(func.name, func.novars, func.code)
-                    structure.tokens.append(func.Token())
+                try:
+                    if func != None:
+                        mem.alloc_func(func.name, func.novars, func.code)
+                        structure.tokens.append(func.Token())
+                except Exception as e:
+                    print(e)
+                    self.output["Errors"].append(f"Overwriting function address [{line.get("line","unknow")}]")
             elif line.tokens[0].expr == "var":
                 try:
                     if line.tokens[1].type != VARIABLES or line.tokens[2].expr != "=":
