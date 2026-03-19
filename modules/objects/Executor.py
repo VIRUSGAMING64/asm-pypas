@@ -4,15 +4,12 @@ import json
 import modules.objects.debug as debug
 import os
 from .structures import *
-from .ast import AST
 import logging
 
-mem = Memory()
-ast = AST()
-
-class Executor:
+class MainHandler:
     def __init__(self,code = ""):
         self.code = code
+        self.mem = Memory()
 
     def func(self,start, lines):
         eofun,code = self.extract(start + 1, lines)
@@ -65,7 +62,7 @@ class Executor:
                 func,i = self.func(i,lines)
                 try:
                     if func != None:
-                        mem.alloc_func(func.name, func.novars, func.code)
+                        self.mem.alloc_func(func.name, func.novars, func.code)
                         structure.tokens.append(func.Token())
                 except Exception as e:
                     logging.log(logging.DEBUG,e)
@@ -75,7 +72,7 @@ class Executor:
                     if line.tokens[1].type != VARIABLES or line.tokens[2].expr != "=":
                         raise "error"
                     
-                    mem.alloc_var(line.tokens[1].expr, ast.eval(line.tokens[3:]))
+                    self.mem.alloc_var(line.tokens[1].expr, eval(line.tokens[3:]))
                 except:
                     self.output["Errors"].append(f"Invalid variable declaration at line [{line.get("line","unknow")}]")
             else:
@@ -93,8 +90,6 @@ class Executor:
 
 
     def run(self, code = None):
-        global mem
-        mem.mem =  {}
         
         if code != None:
             self.code = code
@@ -115,4 +110,6 @@ class Executor:
             
         debug.dst(structure)
         logging.log(logging.DEBUG,mem.mem)
+
+
         return self.output

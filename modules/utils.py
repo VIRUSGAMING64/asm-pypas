@@ -4,14 +4,25 @@ from .t_statics import *
 
 
 def getPrio(expr):
-    if expr in P0:
+    if expr.data.get("neg", False):
+        return 3
+    op = expr.expr
+    if op in P0:
         return 0
-    if expr in P1:
+    if op in P1:
         return 1
-    if expr in P2:
+    if op in P2:
         return 2
-    else:
-        return 4
+    return -1
+
+def isdelim(s):
+    return True if s == " " else False
+
+def is_operator(s):
+    return True if s in operations else False
+
+def is_unary(s):
+    return True if s in ["+", "-", "!"] else False
 
 def add(a,b):
     return a + b
@@ -29,6 +40,29 @@ def _xor(a,b):
     return a ^ b
 def _and(a,b):
     return a and b
+def eq(a, b):
+    return a == b
+def neg(a):
+    return  -a
+def plus(a):
+    return a
+def ge(a, b):
+    return a > b
+def le(a, b):
+    return a < b
+def leq(a, b):
+    return a <= b
+def geq(a, b):
+    return a >= b
+
+una = {
+    "-": neg,
+    "+": plus,
+    "!": _not
+}
+
+def UnaryOP(a,op):
+    return una[op.expr](a)
 
 operations = {
     "+":add,
@@ -38,11 +72,16 @@ operations = {
     "!":_not,
     "|":_or,
     "^":_xor,
-    "&":_and
+    "&":_and,
+    "==": eq,
+    "<=": leq,
+    ">=": geq,
+    "<": le,
+    ">": ge
 }
 
-def _process_op(a,b,op):
-    return operations[op](a,b)
+def process_op(b,a,op):
+    return operations[op.expr](int(a.expr),int(b.expr))
 
 def read(path, mode = "rb"):
     file = open(path,mode)

@@ -28,7 +28,7 @@ def run():
         codes[name] = code
         saver.save(name,code.decode())
 
-    exe = Executor(code.decode())
+    exe = MainHandler(code.decode())
     out = exe.run()
     logging.log(logging.DEBUG,out)
     return out,200

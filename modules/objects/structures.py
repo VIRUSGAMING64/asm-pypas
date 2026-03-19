@@ -79,4 +79,45 @@ class FUNCS:
           self.code.tokens
         )
     
-class FUNC_CALL: ...
+
+
+
+class Evaluator:
+    def __init__(self,structure:Token = None, start = None):
+        self.pos = start if start is not None else 0
+        self.exceptions = []
+        self.Tree = structure
+        if self.Tree is None:
+            raise Exception("The source tree is None")
+
+    def step(self):
+        self.execute(self.Tree.tokens[self.pos])
+        self.pos += 1
+
+    def execute(self, line):
+        if line.tokens == None:
+            return
+
+        if len(line.tokens) == 0:
+            return
+
+        if line.tokens[0].type == CONDITION:
+            self.execute_condition(line)
+
+        elif line.tokens[0].type == FUNC:
+            self.execute_func(line)
+        
+        else:
+            raise Exception(f"Unknown token [{line.get("line","unknow")}]")
+    
+    def execute_condition(self, line):
+        line.data["condition"] = Expression(line.data["condition"]).eval()
+        if line.data["condition"]:
+            for i in line.tokens:
+                self.execute(i)
+
+    def execute_func(self, line):
+        pass
+
+    def jump(self, pos):
+        self.pos = pos
