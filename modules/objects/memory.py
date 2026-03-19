@@ -11,8 +11,8 @@ class mem_Func:
 
 
 class Memory:
-    def __init__(self,memory_map = {} , max_alloc=-1):
-        self.mem = memory_map
+    def __init__(self,memory_map = None , max_alloc=-1):
+        self.mem = {} if memory_map is None else memory_map
 
     def alloc_var(self, addr,value):
         self.mem[addr] = mem_Var(
@@ -28,6 +28,5 @@ class Memory:
         if val != None:
             raise "Overwrite addr"
         
-        self.mem[addr] = {
-            mem_Func(addr,NoA, code)
-        }
+        self.mem[addr] = mem_Func(addr,NoA, code)
+        

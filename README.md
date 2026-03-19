@@ -1,17 +1,30 @@
-# ASM-PyPas
+# 🚀 ASM-PyPas
 
 ASM-PyPas es un proyecto en desarrollo orientado a construir un intérprete con interfaz web para un lenguaje propio. Cuando esté finalizado, permitirá escribir código desde el navegador, administrar varios archivos fuente, guardar cambios automáticamente, ejecutar programas contra el motor del intérprete y visualizar errores o resultados desde una terminal integrada. La idea del proyecto es unir un backend en Python con una interfaz sencilla para experimentar con análisis, tokenización y ejecución de código.
 
-## Qué hará el proyecto al finalizarse
+## ✨ Qué hará el proyecto al finalizarse
 
-- Editar programas desde una interfaz web.
-- Crear, abrir, guardar y eliminar archivos de código.
-- Interpretar instrucciones del lenguaje definido en el proyecto.
-- Validar la sintaxis y reportar errores encontrados.
-- Gestionar estructuras como variables, funciones y condicionales.
-- Mostrar la salida de ejecución dentro de la misma interfaz.
+- 🖊️ Editar programas desde una interfaz web.
+- 📁 Crear, abrir, guardar y eliminar archivos de código.
+- ⚙️ Interpretar instrucciones del lenguaje definido en el proyecto.
+- ✅ Validar la sintaxis y reportar errores encontrados.
+- 🧠 Gestionar estructuras como variables, funciones y condicionales.
+- 💻 Mostrar la salida de ejecución dentro de la misma interfaz.
 
-## Estructura del repositorio
+## 🔄 Workflow del programa
+
+De forma general, el flujo del programa funciona así:
+
+1. 🖥️ El usuario escribe o edita código desde la interfaz web.
+2. 💾 El frontend guarda automáticamente los cambios en el servidor dentro de la carpeta `codes/`.
+3. ▶️ Cuando el usuario ejecuta el código, el backend recibe el contenido desde Flask.
+4. 🔎 El intérprete tokeniza y analiza las instrucciones para identificar variables, funciones, condiciones y expresiones.
+5. ⚠️ Si encuentra errores de sintaxis o estructura, los devuelve a la terminal visual de la interfaz.
+6. 📤 Si no hay errores, el sistema entrega el resultado de la ejecución al usuario.
+
+Este flujo conecta la interfaz ubicada en `gui/`, la lógica principal en `main.py` y el motor del intérprete distribuido dentro de `modules/`.
+
+## 🌳 Estructura del repositorio
 
 ```text
 asm-pypas/
@@ -64,21 +77,21 @@ asm-pypas/
 └── templates/
 ```
 
-## Cómo clonar el proyecto
+## 📥 Cómo clonar el proyecto
 
 ```bash
 git clone https://github.com/VIRUSGAMING64/Interpreter.git
 cd Interpreter
 ```
 
-## Cómo ejecutarlo
+## ▶️ Cómo ejecutarlo
 
-### Requisitos
+### 📋 Requisitos
 
-- Python 3
-- pip
+- 🐍 Python 3
+- 📦 pip
 
-### Instalación y arranque
+### 🛠️ Instalación y arranque
 
 ```bash
 python3 -m venv .venv
@@ -93,8 +106,8 @@ Después de iniciar el servidor, abre tu navegador en:
 http://127.0.0.1:9000
 ```
 
-## Notas
+## 📝 Notas
 
-- El backend está construido con Flask.
-- La interfaz usa CodeMirror para la edición de código.
-- Los archivos creados desde la interfaz se almacenan en la carpeta `codes/`.
+- 🔹 El backend está construido con Flask.
+- 🔹 La interfaz usa CodeMirror para la edición de código.
+- 🔹 Los archivos creados desde la interfaz se almacenan en la carpeta `codes/`.

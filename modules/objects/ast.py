@@ -6,7 +6,7 @@ class AST:
 
     def eval(self,line:list[Token]):
         if len(line) < 1:
-            raise "line is empty"
+            raise Exception("line is empty")
         
         if len(line) == 1:
             return line[0]

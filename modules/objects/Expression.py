@@ -23,7 +23,9 @@ def TokenizeSource(code,output):
         p = 0
         for line in code:
             p +=1
-            if line == "": continue #TODO esto se debe arreglar, lo deje asi por ahora
+            if line == "": 
+                continue
+            
             ex = Expression(line)
             print("-" * 8)
             line = ex.Token()

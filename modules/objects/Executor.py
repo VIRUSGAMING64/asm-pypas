@@ -5,6 +5,8 @@ import modules.objects.debug as debug
 import os
 from .structures import *
 from .ast import AST
+import logging
+
 mem = Memory()
 ast = AST()
 
@@ -20,13 +22,13 @@ class Executor:
             fun.code = code
         except Exception as e:
             self.output["Errors"].append(str(e))
-            print(e)
+            logging.log(logging.DEBUG,e)
         
         return fun,eofun
 
 
     def control(self, start,lines):
-        print(lines[start].expr)
+        logging.log(logging.DEBUG,lines[start].expr)
         eoif,code = self.extract(start+1,lines)
         cond = None
         try:
@@ -34,7 +36,7 @@ class Executor:
         except Exception as e:
             self.output["Errors"].append(str(e))
             
-        print(start, eoif)
+        logging.log(logging.DEBUG,start, eoif)
         assert eoif >= start
         return  cond,eoif
 
@@ -47,7 +49,7 @@ class Executor:
         while i < len(lines):
             line = lines[i]
             if len(line.tokens) == 0:
-                print(line.tokens, line.expr)
+                logging.log(logging.DEBUG,line.tokens, line.expr)
                 i+=1
                 continue
 
@@ -57,7 +59,8 @@ class Executor:
                     structure.tokens.append(cond.Token())
             
             elif line.tokens[0].expr == "while":
-                pass
+                pass #!TODO
+
             elif line.tokens[0].expr == "func":
                 func,i = self.func(i,lines)
                 try:
@@ -65,7 +68,7 @@ class Executor:
                         mem.alloc_func(func.name, func.novars, func.code)
                         structure.tokens.append(func.Token())
                 except Exception as e:
-                    print(e)
+                    logging.log(logging.DEBUG,e)
                     self.output["Errors"].append(f"Overwriting function address [{line.get("line","unknow")}]")
             elif line.tokens[0].expr == "var":
                 try:
@@ -76,7 +79,7 @@ class Executor:
                 except:
                     self.output["Errors"].append(f"Invalid variable declaration at line [{line.get("line","unknow")}]")
             else:
-                print("added",line.expr)
+                logging.log(logging.DEBUG,"added",line.expr)
                 structure.tokens.append(line)   
             if line.tokens[0].expr == "end":
                 return i,structure
@@ -111,5 +114,5 @@ class Executor:
             self.output["result"] = "to many errors"
             
         debug.dst(structure)
-        print(mem.mem)
+        logging.log(logging.DEBUG,mem.mem)
         return self.output

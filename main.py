@@ -7,7 +7,7 @@ cods = os.listdir("codes")
 codes = {}
 for name in cods:
     data = read("codes/"+name)
-    if data == "":
+    if data == b"":
         os.remove("codes/" + name)
         continue
     codes[name] = data
@@ -22,15 +22,15 @@ saver = CodeSaver("codes/")
 def run():
     code = flask.request.args.get("code", "")
     name = flask.request.args.get("name", "")
-    print("running code...")
+    logging.log(logging.DEBUG,"running code...")
     code = code.encode()
-    if code != codes[name]:
+    if code != codes.get(name, b""):
         codes[name] = code
         saver.save(name,code.decode())
 
     exe = Executor(code.decode())
     out = exe.run()
-    print(out)
+    logging.log(logging.DEBUG,out)
     return out,200
     
     
@@ -46,10 +46,16 @@ def save():
     return {"status":"ok"},200
 
 
-@app.route("/getcode")
+@app.route("/getcode", methods=["POST"])
 def sendCode():
-    name = flask.request.args.get("name", "")
-    cod = codes.get(name, b"").decode()
+    name = flask.request.args.get("name")
+    logging.log(logging.DEBUG,name)
+    cod = codes.get(name, b"")
+    if isinstance(cod, bytes):
+        cod = cod.decode()
+    else:
+        return {"status":"fail"},200
+    
     return {"status":"ok","code":cod},200
 
 
@@ -67,9 +73,15 @@ def show_subpath(subpath):
 @app.route("/getcodes")
 def getcodes():
     name = flask.request.args.get("name", "")
+    cod =codes.get(name, b"")
+    if isinstance(cod, bytes):
+        cod = cod.decode()
+    else:
+        return {"status" : "fail"}
+    
     return {
         "status":"ok",
-        "code"  : codes.get(name, b"").decode()
+        "code"  : cod
     }
 
 @app.route("/initcodes")
@@ -78,7 +90,7 @@ def initcodes():
     cods = []
     for name in os.listdir("codes"):
         code = read("codes/"+name)
-        if code == "":
+        if code == b"":
             continue
         
         cods.append(name)
@@ -101,17 +113,18 @@ def newcode():
         "status":"ok",
         "code": ""        
     }
-    codes[name] = ""
+    codes[name] = b""
     return res,200
 
 @app.route("/delcurr")
 def delcode():
     file = flask.request.args.get("name")
-    file.replace("..", "")
+    file = file.replace("..", "")
     try:
         os.remove(os.path.abspath("./codes/")+"/"+file)
     except Exception as e:
-        print(e)
+        logging.log(logging.DEBUG,e)
     return {"status":"ok"}
 
-app.run("0.0.0.0", 9000)
+if __name__ == "__main__":
+    app.run("0.0.0.0", 9000)

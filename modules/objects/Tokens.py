@@ -29,10 +29,11 @@ def Tokenize(code):
                 if pos + 1 != len(code) and code[pos] + code[pos + 1] in operators:
                     toks[len(toks) - 1].expr += code[pos + 1]
                     pos += 1
-                
+         
             if p: 
                 pos += 1
                 continue
+        
             t_obj = toks[len(toks) + dis]
             le = len(t_obj.expr)
             if t_obj.expr.isnumeric():
@@ -58,14 +59,11 @@ def Tokenize(code):
         line:Token = toks[i]
         if line.type == NIL:
             splited_tokens = line.getErrs()
-            print(splited_tokens)
             for t in splited_tokens:
-                try:
-                    line_tokens.append(t[0])
-                except Exception as e:
-                    print(e)
+                line_tokens.append(t[0])          
         else:
             line_tokens.append(line)
+            
     return line_tokens
 
 class Token:

@@ -53,7 +53,12 @@ async function NewCode() {
         names = prompt("Name of new file: ")
     }
     current = names
-    buttons.innerHTML += '<button class="saves" onclick="changeto(\'' + names + '\')" id="'+names+'">' + names + "</button>"
+    var butt = document.createElement("button")
+    butt.className = "saves"
+    butt.onclick = function () { changeto(names) }
+    butt.id = names
+    butt.textContent = names
+    buttons.appendChild(butt)
     await fetch("/newcode?name="+names)
     editor.setValue("")
 }
@@ -67,7 +72,12 @@ async function initSaved() {
     if (data["status"] == "ok"){
         for(var i = 0; i < data["names"].length; i ++){
             id = data["names"][i]
-            buttons.innerHTML += '<button class="saves" onclick="changeto(\'' + id + '\')" id="' + id + '">' + id + "</button>"
+            var butt = document.createElement("button")
+            butt.className = "saves"
+            butt.onclick = function() { changeto(id) }
+            butt.id = id
+            butt.textContent = id
+            buttons.appendChild(butt)
             ok = 1
             current = id
         }
@@ -82,7 +92,7 @@ async function getCode() {
     if (ok == 0)
         await NewCode()
 
-    const response = await fetch("/getcode?name=" + current);
+    const response = await fetch("/getcode?name=" + current, { "method": "POST" });
     const data = await response.json()
     console.log(data)
     if (data["status"] == "ok") {
@@ -104,9 +114,13 @@ async function delcurr() {
 
 
 getCode()
-
+ini = ""
 setInterval(() => {
-    submitCode("save")
+    newcod = editor.getValue()
+    if (newcod != ini) { 
+        ini = newcod
+        submitCode("save")
+    }
 }, 1000);
 
 

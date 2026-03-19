@@ -31,11 +31,9 @@ class FUNCS:
         self.declaration()
 
     def declaration(self):
-        print("Hereee")
         if len(self.decl.tokens) < 4:
             raise Exception(f"Invalid function declaration at line [{self.i}]")
 
-        print("Hereee")
         toks = self.decl.tokens
         novars = []
         if toks[1].type != VARIABLES or toks[2].expr != "(":
@@ -55,19 +53,15 @@ class FUNCS:
                     raise Exception(f"Invalid function declaration at line [{self.i}]")
                
                 novars.append(var.expr)      
-
+                
                 if comma.expr == ")":
                     if (pointer + 2 != len(toks)):
                         raise Exception(f"Invalid function declaration at line [{self.i}]")
                     break
 
-                if comma.expr != ',':                
-                    for i in toks:
-                        print(i.expr, end = " ")
-                    print(var.expr,comma.expr)
+                if comma.expr != ',':       
                     raise Exception(f"invalid token in function declaration [{self.i}]")
-                 
-
+                
             except Exception as e:
                 raise e
 
