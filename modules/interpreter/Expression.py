@@ -1,6 +1,6 @@
-from modules.objects.Tokens import *
-from modules.utils import *
-from modules.objects.memory import *
+from modules.interpreter.Tokens import *
+from modules.generic.utils import *
+from modules.interpreter.memory import *
 
 class Expression:
     def __init__(self, expr):

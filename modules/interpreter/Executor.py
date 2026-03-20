@@ -1,7 +1,7 @@
-from modules.utils import *
+from modules.generic.utils import *
 from .Expression import *
 import json
-import modules.objects.debug as debug
+import modules.interpreter.debug as debug
 import os
 from .structures import *
 import logging
@@ -66,15 +66,16 @@ class MainHandler:
                         structure.tokens.append(func.Token())
                 except Exception as e:
                     logging.log(logging.DEBUG,e)
-                    self.output["Errors"].append(f"Overwriting function address [{line.get("line","unknow")}]")
+                    self.output["Errors"].append(f"Overwriting function address [{line.get('line','unknow')}]")
             elif line.tokens[0].expr == "var":
                 try:
                     if line.tokens[1].type != VARIABLES or line.tokens[2].expr != "=":
                         raise "error"
-                    
-                    self.mem.alloc_var(line.tokens[1].expr, eval(line.tokens[3:]))
+                
+                    self.mem.alloc_var(line.tokens[1].expr, (line.tokens[3:]))
+                    # recordar que se guarda lista de tokens, no el valor, para evaluar a la hora de usar la variable
                 except:
-                    self.output["Errors"].append(f"Invalid variable declaration at line [{line.get("line","unknow")}]")
+                    self.output["Errors"].append(f"Invalid variable declaration at line [{line.get('line','unknow')}]")
             else:
                 logging.log(logging.DEBUG,"added",line.expr)
                 structure.tokens.append(line)   
@@ -109,7 +110,7 @@ class MainHandler:
             self.output["result"] = "to many errors"
             
         debug.dst(structure)
-        logging.log(logging.DEBUG,mem.mem)
+        logging.log(logging.DEBUG,self.mem.mem)
 
 
         return self.output

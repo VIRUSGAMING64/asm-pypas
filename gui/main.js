@@ -17,29 +17,48 @@ async function submitCode(path) {
         return
     }
 
-    var text = encodeURI(editor.getValue())
-    console.log(text)
-    
-    var url = "/" + path + '?name=' + current + '&code=' + text;
-    data = await fetch(url)
-    data = await data.json()
-    if (path == "run") {
-        elem = document.querySelector(".output")
-        console.log(elem)
-        elem.innerText = data["result"]
-        document.querySelector(".output").innerText = ""
-        for (var i = 0; i < data["Errors"].length; i += 1) {
-            var div = document.createElement("div")
-            div.innerText = data["Errors"][i]
-            console.log(div.innerText)
-            document.querySelector(".output").appendChild(div)
+    try {
+        const payload = {
+            name: current,
+            code: editor.getValue()
         }
-        
+
+        let response = await fetch("/api/" + path, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        })
+        let data = await response.json()
+
+        if (!response.ok) {
+            throw new Error(data["message"] || "request failed")
+        }
+
+        if (path == "run") {
+            elem = document.querySelector(".output")
+            console.log(elem)
+            elem.innerText = data["result"]
+            document.querySelector(".output").innerText = ""
+            for (var i = 0; i < data["Errors"].length; i += 1) {
+                var div = document.createElement("div")
+                div.innerText = data["Errors"][i]
+                console.log(div.innerText)
+                document.querySelector(".output").appendChild(div)
+            }
+        }
+    }
+    catch (error) {
+        console.error(error)
+        if (path == "run") {
+            document.querySelector(".output").innerText = error.message
+        }
     }
 }
 
 async function changeto(idx){
-    const response = await fetch("/getcodes?name="+idx)
+    const response = await fetch("/api/getcodes?name="+idx)
     current = idx
     const data = await response.json()
     code = data["code"]
@@ -59,12 +78,12 @@ async function NewCode() {
     butt.id = names
     butt.textContent = names
     buttons.appendChild(butt)
-    await fetch("/newcode?name="+names)
+    await fetch("/api/newcode?name="+names)
     editor.setValue("")
 }
 
 async function initSaved() {
-    const response = await fetch("/initcodes")
+    const response = await fetch("/api/initcodes")
     const data = await response.json()
 
     var buttons = document.getElementById("saves")
@@ -92,7 +111,7 @@ async function getCode() {
     if (ok == 0)
         await NewCode()
 
-    const response = await fetch("/getcode?name=" + current, { "method": "POST" });
+    const response = await fetch("/api/getcode?name=" + current, { "method": "POST" });
     const data = await response.json()
     console.log(data)
     if (data["status"] == "ok") {
@@ -104,9 +123,8 @@ async function getCode() {
 async function delcurr() {
     editor.setValue("")
     var div = document.getElementById(current)
-    await fetch("/delcurr?name="+current)
+    await fetch("/api/delcurr?name="+current)
     div.remove()
-    submitCode("save")
     alert("deleted file: " + current)
     current = ""
 

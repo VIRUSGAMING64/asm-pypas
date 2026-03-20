@@ -1,2 +1,2 @@
-from modules.utils import *
-from modules.objects import *
+from modules.interpreter import *
+from modules.web import *

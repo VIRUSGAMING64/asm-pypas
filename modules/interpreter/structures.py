@@ -7,7 +7,7 @@ class IF:
         self.code = None
 
         if len(decl.tokens) < 2:
-            raise Exception(f"invalid declaration at line [{decl.get("line", "unknow")}]")  
+            raise Exception(f"invalid declaration at line [{decl.get('line', 'unknow')}]")  
             
         self.cond = decl.tokens[1:]
         self.code = code

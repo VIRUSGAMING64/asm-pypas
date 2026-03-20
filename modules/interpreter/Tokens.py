@@ -1,6 +1,9 @@
-from modules.utils import *
-from modules.t_statics import *
+from modules.generic.utils import *
+from modules.interpreter.t_statics import *
+import functools
 
+
+@functools.lru_cache()
 def Tokenize(code):
 
     pos = 0

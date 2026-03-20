@@ -1,8 +1,10 @@
 import mimetypes
 import flask
-from .t_statics import *
+from ..interpreter.t_statics import *
+import functools
+import logging
 
-
+@functools.lru_cache()
 def getPrio(expr):
     if expr.data.get("neg", False):
         return 3
@@ -18,6 +20,7 @@ def getPrio(expr):
 def isdelim(s):
     return True if s == " " else False
 
+@functools.lru_cache()
 def is_operator(s):
     return True if s in operations else False
 
@@ -84,10 +87,13 @@ def process_op(b,a,op):
     return operations[op.expr](int(a.expr),int(b.expr))
 
 def read(path, mode = "rb"):
-    file = open(path,mode)
-    data = file.read(2**30)
-    file.close()
-    return data
+    try:
+        file = open(path,mode)
+        data = file.read()
+        file.close()
+        return data
+    except Exception as e:
+        logging.log(logging.DEBUG,f"{e}")
 
 def getmimetype(path):
     return mimetypes.guess_type(path)[0]
@@ -118,4 +124,5 @@ def cleanStr(s: str) -> str:
     while s.endswith(" "):
         s = s.removesuffix(" ")
     return s
+
 
