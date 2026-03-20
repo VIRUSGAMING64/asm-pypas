@@ -6,3 +6,7 @@ src
 informe.*
 problems.md
 .cph-ng
+**.log
+**.aux
+**.tex
+docs
