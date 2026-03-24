@@ -4,11 +4,11 @@ import functools
 
 
 @functools.lru_cache()
-def Tokenize(code):
+def Tokenize(code: str) -> list[Token]:
 
     pos = 0
     act_tok = ""
-    toks = []
+    tokens = []
     start_str = None
     in_str = False
 
@@ -28,40 +28,43 @@ def Tokenize(code):
         else:
             dis = -1        
             act_tok = cleanStr(act_tok)
-            toks.append(Token(act_tok,NIL))
+            tokens.append(Token(act_tok,NIL))
 
             if pos < len(code):            
                 dis -= 1
             
             p = False
             if act_tok == "":
-                toks.pop()
+                tokens.pop()
                 p = True
 
             if dis == -2:
-                toks.append(Token(code[pos], OPERATION))
+                tokens.append(Token(code[pos], OPERATION))
                 if pos + 1 != len(code) and code[pos] + code[pos + 1] in operators:
-                    toks[len(toks) - 1].expr += code[pos + 1]
+                    tokens[len(tokens) - 1].expr += code[pos + 1]
                     pos += 1
          
             if p: 
                 pos += 1
                 continue
         
-            t_obj = toks[len(toks) + dis]
-            le = len(t_obj.expr)
-            if t_obj.expr.isnumeric():
-                t_obj.type = NUMBER
-            elif t_obj.expr.startswith("\"") and t_obj.expr.endswith("\"") and le > 1:
-                t_obj.type = STRING
-            elif t_obj.expr.startswith("'") and t_obj.expr.endswith("'") and le > 1:
-                t_obj.type = STRING
-            elif t_obj.isKeyword():
-                t_obj.type = KEYWORD
-            elif t_obj.isLabel():
-                t_obj.type = LABEL
-            elif t_obj.VarName():
-                t_obj.type = VARIABLES
+            t_token = tokens[len(tokens) + dis]
+            le = len(t_token.expr)
+            if t_token.expr.isnumeric():
+                t_token.type = NUMBER
+                t_token.expr = int(t_token.expr)
+            elif t_token.expr.startswith("\"") and t_token.expr.endswith("\"") and le > 1:
+                t_token.type = STRING
+                t_token.expr = t_token.expr.removeprefix("\"").removesuffix("\"")
+            elif t_token.expr.startswith("'") and t_token.expr.endswith("'") and le > 1:
+                t_token.type = STRING
+                t_token.expr = t_token.expr.removeprefix("\'").removesuffix("\'")
+            elif t_token.isKeyword():
+                t_token.type = KEYWORD
+            elif t_token.isLabel():
+                t_token.type = LABEL
+            elif t_token.VarName():
+                t_token.type = VARIABLES
             
             act_tok = ""
 
@@ -69,8 +72,8 @@ def Tokenize(code):
 
 
     line_tokens = []
-    for i in range(len(toks)):
-        line:Token = toks[i]
+    for i in range(len(tokens)):
+        line:Token = tokens[i]
         if line.type == NIL:
             splited_tokens = line.getErrs()
             for t in splited_tokens:
@@ -86,6 +89,25 @@ class Token:
         self.type = type
         self.tokens  = tokens
         self.data = {}
+
+    def __truediv__(self, other):
+        return self.expr // other.expr
+
+    def __add__(self, other):
+        return self.expr + other.expr
+
+    def __mul__(self, other):
+        return self.expr * other.expr 
+
+    def __sub__(self, other):
+        return self.expr - other.expr
+
+    def __hash__(self):
+        return self.expr.__hash__()
+    
+    def __abs__(self):
+        return self.expr.__abs__()
+
 
     def get(self,key,default):
         return self.data.get(key,default)

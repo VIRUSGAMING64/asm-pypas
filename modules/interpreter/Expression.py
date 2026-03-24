@@ -2,11 +2,11 @@ from modules.interpreter.Tokens import *
 from modules.generic.utils import *
 from modules.interpreter.memory import *
 
-
 class Expression:
-    def __init__(self, expr = None):
+    def __init__(self, expr = None, memory=None):
         self.expr:str = expr
         self.type     = None
+        self.memory = memory
 
     def Token(self):
         self.expr = cleanStr(self.expr)
@@ -24,11 +24,17 @@ class Expression:
         return self.evalTokens(toks)
 
     def evalTokens(self,toks):
+        if isinstance(toks, list):
+            toks = Token("__sourcecode__", LINE , toks)
+        
         nums    = []
         oper    = []
         unary   = True 
 
         for elem in toks.tokens:
+
+            if elem.type == VARIABLES:
+                elem.expr = self.memory.query(elem.expr)
 
             if elem.expr == "(":
                 oper.append(elem)
@@ -50,7 +56,6 @@ class Expression:
                 oper.pop()
                 unary = False
 
-
             elif is_operator(elem.expr):
                 if unary and is_unary(elem.expr):
                     elem.data["neg"] = True
@@ -71,16 +76,12 @@ class Expression:
                     b = nums.pop()        
                     nums.append(Token(process_op(a, b , opp), NUMBER))
 
-
                 unary = True
                 oper.append(elem)
-            
             
             else:
                 unary = False
                 nums.append(elem)
-
-
         while len(oper):
             a = nums.pop()
             opp = oper.pop()
@@ -92,9 +93,7 @@ class Expression:
             n = process_op(a, b, opp)
             nums.append(Token(n, NUMBER))
     
-        print(nums, oper)
         return nums,oper
-
 
 def TokenizeSource(code,output):
         lines = []
@@ -126,3 +125,4 @@ def TokenizeSource(code,output):
                 print(j.type,j.expr)
         
         return lines
+

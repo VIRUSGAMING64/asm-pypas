@@ -44,25 +44,29 @@ def _xor(a,b):
 def _and(a,b):
     return a and b
 def eq(a, b):
-    return a == b
+    return a.expr == b.expr
 def neg(a):
-    return  -a
+    return  -a.expr
 def plus(a):
-    return a
+    return a.expr
 def ge(a, b):
-    return a > b
+    return a.expr > b.expr
 def le(a, b):
-    return a < b
+    return a.expr < b.expr
 def leq(a, b):
-    return a <= b
+    return a.expr <= b.expr
 def geq(a, b):
-    return a >= b
+    return a.expr >= b.expr
 
 una = {
     "-": neg,
     "+": plus,
     "!": _not
 }
+
+def asign(a, b):
+    a.expr = b
+
 
 def UnaryOP(a,op):
     return una[op.expr](a)
@@ -80,11 +84,12 @@ operations = {
     "<=": leq,
     ">=": geq,
     "<": le,
-    ">": ge
+    ">": ge,
+    "=": asign
 }
 
 def process_op(b,a,op):
-    return operations[op.expr](int(a.expr),int(b.expr))
+    return operations[op.expr](a,b)
 
 def read(path, mode = "rb"):
     try:
@@ -94,6 +99,7 @@ def read(path, mode = "rb"):
         return data
     except Exception as e:
         logging.log(logging.DEBUG,f"{e}")
+        return b""
 
 def getmimetype(path):
     return mimetypes.guess_type(path)[0]

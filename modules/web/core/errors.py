@@ -10,4 +10,4 @@ def payload_too_large():
 @app.errorhandler(404)
 def notfounderr(arg):
     print(arg)
-    return response(ROOT + "/404.html")
+    return response(ROOT + "/html/404.html")

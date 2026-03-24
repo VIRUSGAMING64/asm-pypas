@@ -13,3 +13,5 @@ docs
 .venv
 .vscode
 .todo
+.clean
+.gitignore

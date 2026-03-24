@@ -1,5 +1,8 @@
 from .Tokens import *
 from .Expression import *
+import modules.interpreter.debug as debug
+
+
 
 class IF: 
     err = []
@@ -83,11 +86,12 @@ class FUNCS:
 
 
 class Evaluator:
-    def __init__(self,structure:Token = None, start = None, output = {}):
+    def __init__(self,structure:Token = None, start = None, output = {},memory = None):
         self.pos = start if start is not None else 0
         self.out = output
         self.exceptions = []
         self.Tree = structure
+        self.memory = memory
         if self.Tree is None:
             raise Exception("The source tree is None")
 
@@ -95,6 +99,11 @@ class Evaluator:
     def run(self):
         while self.step():
             print(f"Executed line: [{self.pos+1}]")
+            if len(self.out['Errors']) >= 1:
+                break
+
+        print("---" * 3, "memory audit", "---" * 3)
+        debug.audit_memory(self.memory)
 
     def step(self):
         self.execute(self.Tree.tokens[self.pos])
@@ -116,14 +125,35 @@ class Evaluator:
 
         elif line.type == FUNC:
             self.execute_func(line)            
+        elif line.tokens[0].expr == 'var':
+            try:
+                if line.tokens[1].type != VARIABLES or line.tokens[2].expr != "=":
+                    raise "error"
+            
+                value,err = Expression(None, self.memory).evalTokens(line.tokens[3:])
+                if len(value) != 1 or len(err) != 0:
+                    raise Exception("Invalid declaration")
+
+                value = value[0].expr
+                self.memory.alloc_var(line.tokens[1].expr,value)
+                
+            except Exception as e:
+                if isinstance(e,ZeroDivisionError):
+                    self.out["Errors"].append(f"Zero division error at line [{line.get("line","unknow")}]")
+                self.out["Errors"].append(f"Invalid variable declaration at line [{line.get('line','unknow')}]")
         else:
             print(line.expr)
 
     def execute_condition(self, line):
-        print("condition: ",line.data["condition"])
-        line.data["condition"] = Expression().evalTokens(
-                Token("condition", CONDITION,line.data["condition"])
-            )
+        print("condition: ",[x.expr for x in line.data["condition"]])
+        
+        value,err = Expression(None, self.memory).evalTokens(line.data["condition"])
+        if len(value) != 1 or len(err) != 0:
+            raise Exception("Invalid condition")
+
+        line.data["condition"] = value[0].expr
+        print(value[0].expr)
+
         if line.data["condition"]:
             for i in line.tokens:
                 self.execute(i)

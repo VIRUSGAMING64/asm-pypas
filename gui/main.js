@@ -58,7 +58,7 @@ async function submitCode(path) {
 }
 
 async function changeto(idx){
-    const response = await fetch("/api/getcodes?name="+idx)
+    const response = await fetch("/api/getcode?name="+idx)
     current = idx
     const data = await response.json()
     code = data["code"]

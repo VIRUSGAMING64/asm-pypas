@@ -8,6 +8,7 @@ class mem_Func:
         self.name = name
         self.args = args
         self.code = code
+        self.value = f"function at [{name}]"
 
 
 class Memory:
@@ -20,13 +21,13 @@ class Memory:
         )
 
     def query(self,addr):
-        value = self.mem.get(addr,None)
+        value = self.mem.get(addr,None).value
         return value
 
     def alloc_func(self,addr, NoA, code):
         val = self.mem.get(addr,None)
         if val != None:
-            raise "Overwrite addr"
+            raise MemoryError("Overwrite addr")
         
         self.mem[addr] = mem_Func(addr,NoA, code)
         

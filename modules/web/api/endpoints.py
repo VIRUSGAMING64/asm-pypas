@@ -17,14 +17,14 @@ def run():
     try:
         if code != codes.get(name, b""):
             codes[name] = code
-            saver.save(name, code.decode("utf-8"))
+            saver.save(name, code.decode())
 
-        exe = interpreter.MainHandler(code.decode("utf-8"))
+        exe = interpreter.MainHandler(code.decode())
         out = exe.run()
         logging.log(logging.DEBUG, out)
         return out, 200
-    except Exception:
-        logging.exception("failed to run code")
+    except Exception as e:
+        logging.exception(f"failed to run code [{str(e)}]")
         return error_response(500, "internal server error")
     
     
@@ -47,13 +47,13 @@ def save():
         return error_response(500, "internal server error")
 
 
-@app.route("/api/getcode", methods=["POST"])
+@app.route("/api/getcode", methods=["POST", "GET"])
 def sendCode():
-    name = flask.request.args.get("name")
+    name = flask.request.args.get("name", None)
+    
     if not is_safe_code_name(name):
         return error_response(400, "invalid file name")
 
-    logging.log(logging.DEBUG,name)
     cod = codes.get(name, b"")
     if isinstance(cod, bytes):
         cod = cod.decode()
@@ -61,24 +61,6 @@ def sendCode():
         return {"status":"fail"},200
     
     return {"status":"ok","code":cod},200
-
-
-@app.route("/api/getcodes")
-def getcodes():
-    name = flask.request.args.get("name", "")
-    if not is_safe_code_name(name):
-        return error_response(400, "invalid file name")
-
-    cod =codes.get(name, b"")
-    if isinstance(cod, bytes):
-        cod = cod.decode()
-    else:
-        return {"status" : "fail"}
-    
-    return {
-        "status":"ok",
-        "code"  : cod
-    }
 
 @app.route("/api/initcodes")
 def initcodes():

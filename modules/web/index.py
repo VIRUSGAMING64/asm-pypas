@@ -22,15 +22,23 @@ for name in os.listdir(CODES_DIR):
 
 @app.route("/")
 def main():
-    return response(ROOT+"/index.html")
+    return response(ROOT+"/html/index.html")
 
 @app.route("/api")
 def api():
-    return response(ROOT + "/api.html")
+    return response(ROOT + "/html/api.html")
 
 
 @app.route('/gui/<path:subpath>')
 def show_subpath(subpath):
-    if ".." in subpath:
-        return "Access denied", 403
-    return response(ROOT+"/"+subpath)
+
+    try:
+        safe_path = CodeSaver(ROOT).resolve_path(subpath) 
+    except Exception as e:
+        logging.log(logging.DEBUG, f"403 at [{subpath}]")
+        return error_response(403, "Access denied")
+    
+    if not os.path.isfile(safe_path):
+        return error_response(404, "file not found")
+    
+    return response(safe_path)

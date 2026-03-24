@@ -50,13 +50,10 @@ class MainHandler:
                 i+=1
                 continue
 
-            if line.tokens[0].expr == "if":
+            elif line.tokens[0].expr == "if":
                 cond,i = self.control(i,lines)
                 if cond != None:
                     structure.tokens.append(cond.Token())
-            
-            elif line.tokens[0].expr == "while":
-                pass #!TODO
 
             elif line.tokens[0].expr == "func":
                 func,i = self.func(i,lines)
@@ -67,18 +64,10 @@ class MainHandler:
                 except Exception as e:
                     logging.log(logging.DEBUG,e)
                     self.output["Errors"].append(f"Overwriting function address [{line.get('line','unknow')}]")
-            elif line.tokens[0].expr == "var":
-                try:
-                    if line.tokens[1].type != VARIABLES or line.tokens[2].expr != "=":
-                        raise "error"
-                
-                    self.mem.alloc_var(line.tokens[1].expr, (line.tokens[3:]))
-                    # recordar que se guarda lista de tokens, no el valor, para evaluar a la hora de usar la variable
-                except:
-                    self.output["Errors"].append(f"Invalid variable declaration at line [{line.get('line','unknow')}]")
             else:
                 logging.log(logging.DEBUG,"added",line.expr)
                 structure.tokens.append(line)   
+            
             if line.tokens[0].expr == "end":
                 return i,structure
                        
@@ -103,6 +92,9 @@ class MainHandler:
         self.code = self.code.replace("\r","  ")
         code = self.code.split("\n")
         lines = TokenizeSource(code,self.output)
+
+        print(lines[0].expr)
+
         s,structure = self.extract(0,lines)
         if len(self.output["Errors"]) == 0:
             self.output["result"] = "no syntaxis error"
@@ -110,7 +102,9 @@ class MainHandler:
             self.output["result"] = "to many errors"
             
         if self.output["Errors"] == []:
-            Evaluator(structure, None, self.output).run()
+            
+            debug.dst(structure)
+            Evaluator(structure, None, self.output, self.mem).run()
         
         logging.log(logging.DEBUG,self.mem.mem)
 
