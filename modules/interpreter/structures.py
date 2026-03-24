@@ -83,16 +83,26 @@ class FUNCS:
 
 
 class Evaluator:
-    def __init__(self,structure:Token = None, start = None):
+    def __init__(self,structure:Token = None, start = None, output = {}):
         self.pos = start if start is not None else 0
+        self.out = output
         self.exceptions = []
         self.Tree = structure
         if self.Tree is None:
             raise Exception("The source tree is None")
 
+
+    def run(self):
+        while self.step():
+            print(f"Executed line: [{self.pos+1}]")
+
     def step(self):
         self.execute(self.Tree.tokens[self.pos])
         self.pos += 1
+        if self.pos >= len(self.Tree.tokens):
+            return False
+
+        return True
 
     def execute(self, line):
         if line.tokens == None:
@@ -101,17 +111,19 @@ class Evaluator:
         if len(line.tokens) == 0:
             return
 
-        if line.tokens[0].type == CONDITION:
+        if line.type == CONDITION:
             self.execute_condition(line)
 
-        elif line.tokens[0].type == FUNC:
-            self.execute_func(line)
-        
+        elif line.type == FUNC:
+            self.execute_func(line)            
         else:
-            raise Exception(f"Unknown token [{line.get("line","unknow")}]")
-    
+            print(line.expr)
+
     def execute_condition(self, line):
-        line.data["condition"] = Expression(line.data["condition"]).eval()
+        print("condition: ",line.data["condition"])
+        line.data["condition"] = Expression().evalTokens(
+                Token("condition", CONDITION,line.data["condition"])
+            )
         if line.data["condition"]:
             for i in line.tokens:
                 self.execute(i)

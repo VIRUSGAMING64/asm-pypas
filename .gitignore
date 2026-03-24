@@ -10,3 +10,6 @@ problems.md
 **.aux
 **.tex
 docs
+.venv
+.vscode
+.todo

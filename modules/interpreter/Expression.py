@@ -2,8 +2,9 @@ from modules.interpreter.Tokens import *
 from modules.generic.utils import *
 from modules.interpreter.memory import *
 
+
 class Expression:
-    def __init__(self, expr):
+    def __init__(self, expr = None):
         self.expr:str = expr
         self.type     = None
 
@@ -28,6 +29,7 @@ class Expression:
         unary   = True 
 
         for elem in toks.tokens:
+
             if elem.expr == "(":
                 oper.append(elem)
                 unary = True

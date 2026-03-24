@@ -109,7 +109,9 @@ class MainHandler:
         else:
             self.output["result"] = "to many errors"
             
-        debug.dst(structure)
+        if self.output["Errors"] == []:
+            Evaluator(structure, None, self.output).run()
+        
         logging.log(logging.DEBUG,self.mem.mem)
 
 

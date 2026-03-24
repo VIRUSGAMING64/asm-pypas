@@ -9,11 +9,22 @@ def Tokenize(code):
     pos = 0
     act_tok = ""
     toks = []
+    start_str = None
+    in_str = False
 
     while pos <= len(code):
 
-        if (pos < len(code)) and (not code[pos] in operators):
+        if (pos < len(code)) and ((not code[pos] in operators) or in_str):
             act_tok += code[pos]
+
+            if start_str == None and code[pos] in ["\"", "\'"]:
+                in_str = not in_str
+                start_str = code[pos]
+            
+            elif code[pos] == start_str:
+                in_str = not in_str
+                start_str = None
+
         else:
             dis = -1        
             act_tok = cleanStr(act_tok)
