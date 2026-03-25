@@ -64,9 +64,9 @@ una = {
     "!": _not
 }
 
-def asign(a, b):
-    a.expr = b
-
+def asign(a, b, mem):
+    a.expr = b.expr
+    mem.Put(a.data["name"], a.expr)
 
 def UnaryOP(a,op):
     return una[op.expr](a)
@@ -88,7 +88,9 @@ operations = {
     "=": asign
 }
 
-def process_op(b,a,op):
+def process_op(b,a,op, mem):
+    if op.expr == "=":
+        return operations[op.expr](a,b,mem)
     return operations[op.expr](a,b)
 
 def read(path, mode = "rb"):

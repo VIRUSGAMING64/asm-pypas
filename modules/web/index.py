@@ -8,9 +8,6 @@ from modules.generic.utils import *
 from modules.web.api.endpoints import *
 from modules.web.core.errors import *
 
-
-
-
 for name in os.listdir(CODES_DIR):
     data = read(saver.resolve_path(name))
     if data == b"":

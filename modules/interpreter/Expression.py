@@ -23,7 +23,13 @@ class Expression:
         toks    = self.Token()
         return self.evalTokens(toks)
 
-    def evalTokens(self,toks):
+    def evalTokens(self, toks):
+        try:
+            return self._evalTokens(toks)
+        except TypeError as e:
+            raise ArithmeticException(None, str(e))
+
+    def _evalTokens(self,toks):
         if isinstance(toks, list):
             toks = Token("__sourcecode__", LINE , toks)
         
@@ -33,6 +39,9 @@ class Expression:
 
         for elem in toks.tokens:
 
+            if elem.type == COMMENT:
+                continue
+            
             if elem.type == VARIABLES:
                 elem.expr = self.memory.query(elem.data["name"])
 
@@ -50,7 +59,7 @@ class Expression:
                         continue
 
                     b = nums.pop()
-                    n = process_op(a, b, opp)
+                    n = process_op(a, b, opp, self.memory)
                     nums.append(Token(n, NUMBER))
                 
                 oper.pop()
@@ -74,7 +83,7 @@ class Expression:
                         continue
 
                     b = nums.pop()        
-                    nums.append(Token(process_op(a, b , opp), NUMBER))
+                    nums.append(Token(process_op(a, b , opp, self.memory), NUMBER))
 
                 unary = True
                 oper.append(elem)
@@ -90,7 +99,7 @@ class Expression:
                 continue
 
             b = nums.pop()
-            n = process_op(a, b, opp)
+            n = process_op(a, b, opp, self.memory)
             nums.append(Token(n, NUMBER))
     
         return nums,oper

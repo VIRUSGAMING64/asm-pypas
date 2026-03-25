@@ -22,7 +22,9 @@ def run():
         exe = interpreter.MainHandler(code.decode())
         out = exe.run()
         logging.log(logging.DEBUG, out)
+        print(out)
         return out, 200
+    
     except Exception as e:
         logging.exception(f"failed to run code [{str(e)}]")
         return error_response(500, "internal server error")

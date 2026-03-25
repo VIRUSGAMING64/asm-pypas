@@ -95,13 +95,8 @@ class MainHandler:
         lines = TokenizeSource(code,self.output)
 
         print(lines[0].expr)
-
         s,structure = self.extract(0,lines)
-        if len(self.output["Errors"]) == 0:
-            self.output["result"] = "no syntaxis error"
-        else:
-            self.output["result"] = "to many errors"
-            
+
         if self.output["Errors"] == []:
             
             debug.dst(structure)

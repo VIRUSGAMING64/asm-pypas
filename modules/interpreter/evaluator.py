@@ -22,11 +22,13 @@ class Evaluator:
                 break
 
         print("---" * 3, "memory audit", "---" * 3)
-        debug.audit_memory(self.memory)
+        audit = debug.audit_memory(self.memory)
+        print(audit)
+        self.out["result"] = audit
 
     def step(self):
         try:
-            retcode = self.execute(self.Tree.tokens[self.pos])
+            retcode = self.execute(self.Tree.tokens[self.pos],self.memory)
             if retcode == INVALID:
                 return False
             self.pos += 1
@@ -37,7 +39,7 @@ class Evaluator:
             return False
         return True
 
-    def execute(self, line):
+    def execute(self, line, mem):
         if line.tokens == None:
             return EMPTY
 
@@ -45,20 +47,20 @@ class Evaluator:
             return EMPTY
 
         if line.type == CONDITION:
-            self.execute_condition(line)
+            self.execute_condition(line, mem.copy())
 
         elif line.type == FUNC:
-            self.execute_func(line)            
+            self.execute_func(line, mem.copy())            
         elif line.tokens[0].expr == 'var':
             try:
                 try:
                     if line.tokens[1].type != VARIABLES or line.tokens[2].expr != "=":
-                        raise DeclarationException(VARIABLES, line)
+                        raise DeclarationException(VARIABLES, line, [])
                 
-                    value,err = Expression(None, self.memory).evalTokens(line.tokens[3:])
+                    value,err = Expression(None, mem).evalTokens(line.tokens[3:])
                 
                     if len(value) != 1 or len(err) != 0:
-                        raise DeclarationException(VARIABLES, line)
+                        raise DeclarationException(VARIABLES, line, [])
                     
                 except DeclarationException as e:
                     if isinstance(e, DeclarationException):
@@ -68,19 +70,24 @@ class Evaluator:
                 try:
                     value = value[0].expr
                     print(line.tokens[1].expr)
-                    self.memory.alloc_var(line.tokens[1].data["name"],value)
+                    mem.alloc_var(line.tokens[1].data["name"],value)
                 except InterpreterMemoryError as e:
                     self.out["Errors"].append(e.GetError())
                     return INVALID
 
-            except Exception as e:
+            except InterpreterException as e:
+                if isinstance(e, ArithmeticException):
+                    e.line = line
+                    self.out["Errors"].append(e.GetError())
+                    return INVALID
+
                 self.out["Errors"].append(f"python exception at line [{line.data["line"]}]:[{str(e)}]")
         else:
-            print(line.expr)
+            Expression(None, self.memory).evalTokens(line)
 
 
-    def execute_condition(self, line):       
-        value,err = Expression(None, self.memory).evalTokens(line.data["condition"])
+    def execute_condition(self, line, mem):       
+        value,err = Expression(None, mem).evalTokens(line.data["condition"])
         if len(value) != 1 or len(err) != 0:
             raise Exception("Invalid condition")
 
@@ -89,7 +96,7 @@ class Evaluator:
 
         if line.data["condition"]:
             for i in line.tokens:
-                self.execute(i)
+                self.execute(i, mem)
 
     def execute_func(self, line):
         pass

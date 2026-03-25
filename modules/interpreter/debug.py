@@ -15,5 +15,7 @@ def dst(structure:Token,prof = 0):
         dst(sub, prof+1)
 
 def audit_memory(mem):
+    s = ""
     for addr in mem.mem:
-        print(addr, mem.query(addr))
+        s += str((addr, mem.query(addr))) + "\n"
+    return s

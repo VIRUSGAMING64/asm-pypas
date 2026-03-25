@@ -1,6 +1,5 @@
 
 from modules.interpreter.Tokens import Token
-
 import logging
 
 class InterpreterException(BaseException):
@@ -24,12 +23,16 @@ class InvalidTokenException(InterpreterException):
     def GetError(self):
         return f"INVALID TOKEN EXCEPTION AT LINE [{self.line}]"
 
-class AricmeticException(InterpreterException):
+class ArithmeticException(InterpreterException):
     def __init__(self, line, *args):
         super().__init__(line, *args)
 
     def GetError(self):
-        return f"INVALID ARICMETIC OPERATION AT LINE [{self.line}]"
+        if self.line != None:
+            self.line=self.GetLine()
+            return f"INVALID ARICMETIC OPERATION AT LINE [{self.line}]"
+        else:
+            return f"INVALID OPERATION [{self.args}]"
 
 class DeclarationException(InterpreterException):
     def __init__(self, type, line, *args):

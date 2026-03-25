@@ -37,9 +37,6 @@ async function submitCode(path) {
         }
 
         if (path == "run") {
-            elem = document.querySelector(".output")
-            console.log(elem)
-            elem.innerText = data["result"]
             document.querySelector(".output").innerText = ""
             for (var i = 0; i < data["Errors"].length; i += 1) {
                 var div = document.createElement("div")
@@ -47,6 +44,10 @@ async function submitCode(path) {
                 console.log(div.innerText)
                 document.querySelector(".output").appendChild(div)
             }
+            var div = document.createElement("div")
+            div.innerText = data["result"]
+            console.log("result: ",data["result"])
+            document.querySelector(".output").appendChild(div)
         }
     }
     catch (error) {

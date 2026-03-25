@@ -78,7 +78,9 @@ def Tokenize(code: str) -> list[Token]:
         if line.type == NIL:
             splited_tokens = line.getErrs()
             for t in splited_tokens:
-                line_tokens.append(t[0])          
+                if t == []:
+                    continue
+                line_tokens.append(t[0])        
         else:
             line_tokens.append(line)
             

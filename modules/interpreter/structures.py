@@ -2,8 +2,6 @@ from .Tokens import *
 from .Expression import *
 import modules.interpreter.debug as debug
 
-
-
 class IF: 
     err = []
     def __init__(self,linenumer ,decl, code = None):
@@ -35,13 +33,11 @@ class FUNCS:
 
     def declaration(self):
         if len(self.decl.tokens) < 4:
-            raise Exception(f"Invalid function declaration at line [{self.i}]")
-
+            raise DeclarationException(FUNC, self.i)
         toks = self.decl.tokens
         novars = []
         if toks[1].type != VARIABLES or toks[2].expr != "(":
-            raise Exception(f"invalid token in function declaration at line [{self.i}]")
-        
+            raise DeclarationException(FUNC, self.i)
         for pointer in range(3, len(toks), 2):
             try:
                 try:
@@ -50,26 +46,26 @@ class FUNCS:
                 except Exception as e:
                     if (var.expr == ")") and pointer == 3:
                         break
-                    raise Exception(f"Invalid token in function declaration at line [{self.i}]")
+                    raise DeclarationException(FUNC, self.i)
                 
                 if var.type != VARIABLES:
-                    raise Exception(f"Invalid function declaration at line [{self.i}]")
-               
+                    raise DeclarationException(FUNC, self.i)      
+                
                 novars.append(var.expr)      
                 
                 if comma.expr == ")":
                     if (pointer + 2 != len(toks)):
-                        raise Exception(f"Invalid function declaration at line [{self.i}]")
+                        raise DeclarationException(FUNC, self.i)
                     break
 
                 if comma.expr != ',':       
-                    raise Exception(f"invalid token in function declaration [{self.i}]")
+                    raise DeclarationException(FUNC, self.i)
                 
             except Exception as e:
                 raise e
 
         self.novars = novars
-        self.name = toks[1].expr
+        self.name = toks[1].data["name"]
         print(novars,set(novars))
         if len(novars) != len(set(novars)):
             raise Exception(f"Invalid function declaration at line [{self.i}]")
