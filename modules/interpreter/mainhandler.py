@@ -54,7 +54,11 @@ class MainHandler:
             elif line.tokens[0].expr == "if":
                 cond,i = self.control(i,lines)
                 if cond != None:
-                    structure.tokens.append(cond.Token())
+                    tk = cond.Token()
+                    tk.data["eoif"] = i
+                    structure.tokens.append(tk)
+                    for tok in cond.code.tokens:
+                        structure.tokens.append(tok)
 
             elif line.tokens[0].expr == "func":
                 func,i = self.func(i,lines)
@@ -70,8 +74,10 @@ class MainHandler:
                 structure.tokens.append(line)   
             
             if line.tokens[0].expr == "end":
-                return i,structure
-                       
+                if start != 0:
+                    return i,structure
+                else:
+                    self.output["Errors"].append(f"invalid end position at line [{line.data["line"]}]")
             i += 1 
 
         if start != 0:

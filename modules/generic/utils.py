@@ -42,21 +42,35 @@ def _or(a,b):
 def _xor(a,b):
     return a ^ b
 def _and(a,b):
-    return a and b
+    return a.expr and b.expr
 def eq(a, b):
     return a.expr == b.expr
+
 def neg(a):
     return  -a.expr
+
 def plus(a):
     return a.expr
+
 def ge(a, b):
     return a.expr > b.expr
+
 def le(a, b):
     return a.expr < b.expr
+
 def leq(a, b):
     return a.expr <= b.expr
+
+
 def geq(a, b):
+    print(a.expr, b.expr)
     return a.expr >= b.expr
+
+def mod(a, b):
+    return a % b
+
+def neq(a,b):
+    return a != b
 
 una = {
     "-": neg,
@@ -80,12 +94,14 @@ operations = {
     "|":_or,
     "^":_xor,
     "&":_and,
+    "!=": neq,
     "==": eq,
     "<=": leq,
     ">=": geq,
     "<": le,
     ">": ge,
-    "=": asign
+    "=": asign,
+    "%": mod
 }
 
 def process_op(b,a,op, mem):

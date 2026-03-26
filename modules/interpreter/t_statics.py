@@ -33,7 +33,7 @@ P1 = [
     "-",
 ]
 
-P2 =[
+P2 = [
     "%",
     "*",
     "/",
@@ -69,7 +69,9 @@ keywords = [
     "var",
     "False",
     "for",
-    "end"
+    "end",
+    "push",
+    "pop"
 ]
 
 maths = {

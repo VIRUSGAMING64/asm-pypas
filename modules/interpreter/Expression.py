@@ -1,7 +1,7 @@
 from modules.interpreter.Tokens import *
 from modules.generic.utils import *
 from modules.interpreter.memory import *
-
+from modules.interpreter.Exceptions import *
 class Expression:
     def __init__(self, expr = None, memory=None):
         self.expr:str = expr
@@ -26,8 +26,10 @@ class Expression:
     def evalTokens(self, toks):
         try:
             return self._evalTokens(toks)
-        except TypeError as e:
-            raise ArithmeticException(None, str(e))
+        except Exception as e:
+            print(e)
+            line = None if isinstance(toks, list) else toks.data["line"]
+            raise ArithmeticException(line, str(e))
 
     def _evalTokens(self,toks):
         if isinstance(toks, list):
@@ -55,7 +57,7 @@ class Expression:
                     opp = oper.pop()
 
                     if opp.data.get("neg", False):
-                        nums.append(Token(UnaryOP(Token(a, NUMBER), opp),BOLEAN))
+                        nums.append(Token(UnaryOP(a, opp),NUMBER))
                         continue
 
                     b = nums.pop()
@@ -78,7 +80,7 @@ class Expression:
                     opp = oper.pop()
                     if opp.data.get("neg", False):
                         nums.append(
-                            Token(UnaryOP(Token(a, NUMBER), opp), NUMBER)
+                            Token(UnaryOP(a,  opp), NUMBER)
                         )
                         continue
 
@@ -95,7 +97,7 @@ class Expression:
             a = nums.pop()
             opp = oper.pop()
             if opp.data.get("neg", False):
-                nums.append(Token(UnaryOP(Token(a, NUMBER), opp),BOLEAN))
+                nums.append(Token(UnaryOP(a, opp),NUMBER))
                 continue
 
             b = nums.pop()
@@ -135,3 +137,6 @@ def TokenizeSource(code,output):
         
         return lines
 
+
+
+Expression("-13").evalstr()[0][0].expr

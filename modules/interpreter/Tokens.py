@@ -2,7 +2,6 @@ from modules.generic.utils import *
 from modules.interpreter.t_statics import *
 import functools
 
-
 @functools.lru_cache()
 def Tokenize(code: str) -> list[Token]:
 
@@ -92,6 +91,14 @@ class Token:
         self.type = type
         self.tokens  = tokens
         self.data = {}
+    
+    def __mod__(self, other):
+        return self.expr % other.expr
+
+    def __ne__(self, value):
+        if isinstance(value , Token):
+            return self.expr != value.expr
+        return self.expr != value
 
     def __truediv__(self, other):
         return self.expr // other.expr
@@ -110,13 +117,19 @@ class Token:
     
     def __abs__(self):
         return self.expr.__abs__()
+    
+    def __and__(self, other):
+        return self.expr and other.expr
 
+    def __le__(self, other):
+        return self.expr < other.expr
 
     def get(self,key,default):
         return self.data.get(key,default)
     
     def put(self, key ,data):
         self.data[key] = data
+
 
     def isKeyword(self):
         return self.expr in keywords

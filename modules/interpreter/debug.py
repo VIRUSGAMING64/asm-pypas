@@ -9,8 +9,6 @@ def dst(structure:Token,prof = 0):
         return
     
     print("-"*40)   
-
-    
     for sub in structure.tokens:
         dst(sub, prof+1)
 

@@ -1,5 +1,4 @@
 
-from modules.interpreter.Tokens import Token
 import logging
 
 class InterpreterException(BaseException):
@@ -12,9 +11,13 @@ class InterpreterException(BaseException):
         return f"UNKNOW EXCEPTION AT LINE [{self.line}]"    
 
     def GetLine(self):
-        if isinstance(self.line , Token):
-            self.line = self.line.data["line"]
+        if self.line == None:
+            return "UNKNOW"
+        if isinstance(self.line , int):
+            return self.line
+        self.line = self.line.data["line"]
         return self.line
+    
 class InvalidTokenException(InterpreterException):
     def __init__(self, token , line, *args):
         super().__init__(line, *args)
@@ -50,3 +53,11 @@ class InterpreterMemoryError(InterpreterException):
 
     def GetError(self):
         return self.args[0]
+
+class GotoException(InterpreterException):
+    def __init__(self, line, *args):
+        super().__init__(line, *args)
+
+    def GetError(self):
+        return f"LABEL NOT FOUND EXCEPTION [{self.line}]"
+    
