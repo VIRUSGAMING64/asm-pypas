@@ -61,3 +61,10 @@ class GotoException(InterpreterException):
     def GetError(self):
         return f"LABEL NOT FOUND EXCEPTION [{self.line}]"
     
+class CallFuncException(InterpreterException):
+    def __init__(self, line, *args):
+        super().__init__(line, *args)
+
+    def GetError(self):
+        return f"function call exception[{self.line}]"
+    

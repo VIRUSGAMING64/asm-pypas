@@ -1,15 +1,15 @@
 from modules.web.core.config import *
 from modules.web.core.saver import *
+import json
+
 
 def error_response(status_code, message):
     return {"status": "fail", "message": message}, status_code
-
 
 def is_safe_code_name(name):
     if not isinstance(name, str):
         return False
 
-        
     name = name.strip()
     if name == "" or name in {".", ".."}:
         return False
@@ -18,14 +18,12 @@ def is_safe_code_name(name):
         return False
 
     saver.resolve_path(name)
-
-
     return True
 
 
 def parse_code_payload():
-    content_length = flask.request.content_length
-    if content_length is not None and content_length > MAX_JSON_PAYLOAD_BYTES:
+    length = flask.request.content_length
+    if length is not None and length > MAX_JSON_PAYLOAD_BYTES:
         return None, None, error_response(400, f"payload too large (max {MAX_CODE_BYTES} bytes for code)")
 
     payload = flask.request.get_json(silent=True)
@@ -34,6 +32,11 @@ def parse_code_payload():
 
     name = payload.get("name")
     code = payload.get("code")
+
+    try:
+        code = json.loads(code)
+    except:
+        pass #* lo que pasa es que no es un json usable (no es una estructura) TODO
 
     if not isinstance(name, str) or name.strip() == "":
         return None, None, error_response(400, "field 'name' is required")

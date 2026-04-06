@@ -91,7 +91,20 @@ class Token:
         self.type = type
         self.tokens  = tokens
         self.data = {}
-    
+
+    def __dict__(self):
+        di = {}
+        di["expr"] = self.expr
+        di["data"] = self.data
+        di["type"] = self.type
+        tok = self.tokens
+        if isinstance(self.tokens, list):
+            tok = []
+            for target in self.tokens:
+                target = target.__dict__()
+                tok.append(target)
+        di["tokens"] = tok
+
     def __mod__(self, other):
         return self.expr % other.expr
 
@@ -130,7 +143,6 @@ class Token:
     def put(self, key ,data):
         self.data[key] = data
 
-
     def isKeyword(self):
         return self.expr in keywords
     
@@ -147,6 +159,7 @@ class Token:
             
         if len(alphas) >= 1:
             return True
+        
         print(alphas)
         return False
     
@@ -169,3 +182,23 @@ class Token:
             arr.append(Tokenize(x))
 
         return arr
+    
+
+def dict2Token(di:dict):
+    typ = di.get("type", None)
+    expr = di.get("expr", None)
+    tokens = di.get("tokens")
+    data = di.get("data", None)
+
+    if None in [typ, expr] or (tokens != None and not isinstance(tokens, list)):
+        raise Exception("Invalid dict")
+    
+    if isinstance(tokens, list):
+        toks = []
+        for tok in tokens:
+            tok = dict2Token(tok)
+            toks.append(tok)
+        tokens = toks
+    n_tok = Token(expr , typ, tokens)
+    n_tok.data = data
+    return 

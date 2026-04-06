@@ -1,112 +1,43 @@
 from modules.generic.utils import *
-from .Expression import *
+from modules.interpreter.Expression import *
+from modules.interpreter.ExprParser import *
 import json
 import modules.interpreter.debug as debug
 import os
 from .structures import *
-from .evaluator import Evaluator
 import logging
+from modules.interpreter.utils import *
 
 class MainHandler:
-    def __init__(self,code = ""):
+    def __init__(self,code = "", memory = None):
         self.code = code
-        self.mem = Memory()
+        self.mem = Memory() if memory is None else memory
 
-    def func(self,start, lines):
-        eofun,code = self.extract(start + 1, lines)
-        try:
-            fun = None
-            fun = FUNCS(start,lines)
-            fun.code = code
-        except Exception as e:
-            self.output["Errors"].append(str(e))
-            logging.log(logging.DEBUG,e)
-        
-        return fun,eofun
+    def run(self):
+        if not isinstance(self.code, str | dict):
+            return {
+                "Errors": ["code is invalid"],
+                "result": ""
+            }
 
+        structure = None
+        if isinstance(self.code,dict):
+            structure = dict2Token(self.code)
 
-    def control(self, start,lines):
-        logging.log(logging.DEBUG,lines[start].expr)
-        eoif,code = self.extract(start+1,lines)
-        cond = None
-        try:
-            cond = IF(start,lines[start],code)
-        except Exception as e:
-            self.output["Errors"].append(str(e))
-            
-        logging.log(logging.DEBUG,start, eoif)
-        assert eoif >= start
-        return  cond,eoif
-
-    def extract(self,start,lines):
-        i = start
-        structure = Token("__source_code__")
-        structure.tokens = []
-
-        while i < len(lines):
-            line = lines[i]
-
-            if len(line.tokens) == 0:
-                logging.log(logging.DEBUG,line.tokens, line.expr)
-                i+=1
-                continue
-            elif line.tokens[0].expr == "if":
-                cond,i = self.control(i,lines)
-                if cond != None:
-                    tk = cond.Token()
-                    tk.data["eoif"] = i
-                    structure.tokens.append(tk)
-                    for tok in cond.code.tokens:
-                        structure.tokens.append(tok)
-
-            elif line.tokens[0].expr == "func":
-                func,i = self.func(i,lines)
-                try:
-                    if func != None:
-                        self.mem.alloc_func(func.name, func.novars, func.code)
-                        structure.tokens.append(func.Token())
-                except Exception as e:
-                    logging.log(logging.DEBUG,e)
-                    self.output["Errors"].append(f"Overwriting function address [{line.get('line','unknow')}]")
-            else:
-                logging.log(logging.DEBUG,"added",line.expr)
-                structure.tokens.append(line)   
-            
-            if line.tokens[0].expr == "end":
-                if start != 0:
-                    return i,structure
-                else:
-                    self.output["Errors"].append(f"invalid end position at line [{line.data["line"]}]")
-            i += 1 
-
-        if start != 0:
-            self.output["Errors"].append("Not closed structure")
-        
-        return i,structure 
-
-
-    def run(self, code = None):
-        
-        if code != None:
-            self.code = code
-
-        self.output = {
-            "Errors": [],
-            "result":""
-        }
-        self.code = self.code.replace("\t","  ")
-        self.code = self.code.replace("\r","  ")
-        code = self.code.split("\n")
-        lines = TokenizeSource(code,self.output)
-
-        print(lines[0].expr)
-        s,structure = self.extract(0,lines)
+        elif isinstance(self.code, str):
+            self.output = {
+                "Errors": [],
+                "result":""
+            }
+            self.code = self.code.replace("\t","  ")
+            self.code = self.code.replace("\r","  ")
+            code = self.code.split("\n")
+            lines = TokenizeSource(code,self.output)
+            s,structure = extract(self.output, self.mem, 0 , lines)
 
         if self.output["Errors"] == []:
+            res = Evaluator(structure, None, self.output, self.mem).run()
             
-            debug.dst(structure)
-            Evaluator(structure, None, self.output, self.mem).run()
-        
         logging.log(logging.DEBUG,self.mem.mem)
 
 

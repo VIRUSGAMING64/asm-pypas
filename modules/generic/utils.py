@@ -150,3 +150,9 @@ def cleanStr(s: str) -> str:
     return s
 
 
+def GetType(p):
+    if isinstance(p, int):
+        return NUMBER
+    elif isinstance(p, str):
+        return STRING
+    return p.type

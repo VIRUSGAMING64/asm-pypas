@@ -8,8 +8,10 @@ import modules.interpreter as interpreter
 @app.route("/api/run", methods=["POST"])
 def run():
     name, code, error = parse_code_payload()
+    
     if error is not None:
         return error
+
     if name not in codes:
         return error_response(404, "code entry not found")
 
@@ -21,8 +23,6 @@ def run():
 
         exe = interpreter.MainHandler(code.decode())
         out = exe.run()
-        logging.log(logging.DEBUG, out)
-        print(out)
         return out, 200
     
     except Exception as e:

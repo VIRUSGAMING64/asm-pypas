@@ -38,6 +38,7 @@ class FUNCS:
         novars = []
         if toks[1].type != VARIABLES or toks[2].expr != "(":
             raise DeclarationException(FUNC, self.i)
+        
         for pointer in range(3, len(toks), 2):
             try:
                 try:
@@ -77,4 +78,6 @@ class FUNCS:
             FUNC,
           self.code.tokens
         )
+
+
     
