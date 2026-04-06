@@ -10,10 +10,6 @@ from modules.web.core.errors import *
 
 for name in os.listdir(CODES_DIR):
     data = read(saver.resolve_path(name))
-    if data == b"":
-        saver.delete(name)
-        continue
-
     codes[name] = data
 
 

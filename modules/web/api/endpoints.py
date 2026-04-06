@@ -114,4 +114,6 @@ def delcode():
         codes.pop(file, None)
     except Exception as e:
         logging.log(logging.DEBUG,e)
-    return {"status":"ok"}
+        return {"status":"fail"}, 405
+
+    return {"status":"ok"} , 200

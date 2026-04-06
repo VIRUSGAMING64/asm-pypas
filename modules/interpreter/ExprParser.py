@@ -4,7 +4,7 @@ from modules.interpreter.Tokens import Token
 from modules.generic.utils import *
 import modules.interpreter.debug as debug
 from modules.interpreter.memory import *
-
+import time
 
 class ExprParser:
 
@@ -90,14 +90,11 @@ class ExprParser:
             if p.get(addr, True) == False:
                 continue
             newmem.mem[addr] = mem.mem[addr] #* Aqui lo que se hace es coger la referencia directa a las globales   
-            print("addr: ",addr)
       
         #! aqui hay que pasarle que variables son globales !!! 
         #! hay que saber si es una llamada de funcion el codigo que se ejecuta !!!
         #! hay que poder cambiar el valor de las variables globales en el codigo de funciones !!       
         ret = Evaluator(code, 0 , self.out, newmem, True).run()       
-        print(debug.audit_memory(newmem))
-
         ret = Token(ret, NUMBER)
         return ret 
 
@@ -108,13 +105,14 @@ class ExprParser:
         nums    = []
         oper    = []
         unary   = True 
+
         self.extract_funcs_call(toks)
 
-        for elem in toks.tokens:
-            
-            if elem.type == FUNCCALL:
+
+        for i in range(len(toks.tokens)):
+            if toks.tokens[i].type == FUNCCALL:
                 args = []
-                for arg in elem.data["args"]:
+                for arg in toks.tokens[i].data["args"]:
                     if arg == []:
                         continue
                     out = self.evalTokens(arg)
@@ -124,14 +122,22 @@ class ExprParser:
                     arg = out[0][0].expr
                     args.append(arg)
 
-                elem = self.call(elem, args, self.memory)
+                toks.tokens[i] = self.call(toks.tokens[i], args, self.memory)
+
+        for i in toks.tokens:
+            print(i.expr, end="")
+        print("")
+        for elem in toks.tokens:
             if elem.type == COMMENT:
                 continue
+            
             if elem.type == VARIABLES:
                 elem.expr = self.memory.query(elem.data["name"])
+            
             if elem.expr == "(":
                 oper.append(elem)
                 unary = True
+            
             elif elem.expr == ")":
                 while oper[-1].expr != "(":
                     self.process(nums, oper)
@@ -165,13 +171,17 @@ class ExprParser:
         a = nums.pop()
         opp = oper.pop()
         if opp.data.get("neg", False):
+            res = UnaryOP(a,  opp)
             nums.append(
-                Token(UnaryOP(a,  opp), NUMBER)
+                Token( res, GetType(res))
             )
             return
         b = nums.pop()        
         n = process_op(a, b, opp, self.memory)
-        nums.append(Token(n, NUMBER))
+        if n == None:
+            #* se esta haciendo una asignacion de valor 
+            n = a
+        nums.append(Token(n, GetType(n)))
 
 class Evaluator:
     def __init__(self,structure:Token = None, start = None, output = {},memory = None, isfunc = False):
@@ -259,7 +269,6 @@ class Evaluator:
             try: #* esto es asi porque primero se intentan usar las variables globales en la linea
                 ExprParser(self.memory,self.out).evalTokens(line)
             except InterpreterMemoryError as e:
-                print(e)
                 ExprParser(mem,self.out).evalTokens(line)
         except InterpreterException as e:
             print(type(e))
@@ -267,7 +276,6 @@ class Evaluator:
             return INVALID,None
         
         return EMPTY, None
-
 
     def find_label(self,line , name):
         name += ":"
@@ -287,7 +295,7 @@ class Evaluator:
             raise Exception("Invalid condition")
         
         if not value[0].expr:
-            newpos=  line.data["eoif"] - 1
+            newpos=  line.data["eoif"]
             print(self.Tree.tokens[newpos].expr)
             return self.jump(newpos),None #! el error es que tiene que coger la linea relativa al trozo !!!
         

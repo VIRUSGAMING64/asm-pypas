@@ -104,38 +104,7 @@ class Token:
                 target = target.__dict__()
                 tok.append(target)
         di["tokens"] = tok
-
-    def __mod__(self, other):
-        return self.expr % other.expr
-
-    def __ne__(self, value):
-        if isinstance(value , Token):
-            return self.expr != value.expr
-        return self.expr != value
-
-    def __truediv__(self, other):
-        return self.expr // other.expr
-
-    def __add__(self, other):
-        return self.expr + other.expr
-
-    def __mul__(self, other):
-        return self.expr * other.expr 
-
-    def __sub__(self, other):
-        return self.expr - other.expr
-
-    def __hash__(self):
-        return self.expr.__hash__()
-    
-    def __abs__(self):
-        return self.expr.__abs__()
-    
-    def __and__(self, other):
-        return self.expr and other.expr
-
-    def __le__(self, other):
-        return self.expr < other.expr
+        return di
 
     def get(self,key,default):
         return self.data.get(key,default)
@@ -201,4 +170,4 @@ def dict2Token(di:dict):
         tokens = toks
     n_tok = Token(expr , typ, tokens)
     n_tok.data = data
-    return 
+    return n_tok

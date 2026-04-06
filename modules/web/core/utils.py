@@ -16,8 +16,11 @@ def is_safe_code_name(name):
 
     if "/" in name or "\\" in name:
         return False
-
-    saver.resolve_path(name)
+    try:
+        saver.resolve_path(name)
+    except Exception as e:
+        print(e)
+        return False
     return True
 
 
@@ -32,11 +35,6 @@ def parse_code_payload():
 
     name = payload.get("name")
     code = payload.get("code")
-
-    try:
-        code = json.loads(code)
-    except:
-        pass #* lo que pasa es que no es un json usable (no es una estructura) TODO
 
     if not isinstance(name, str) or name.strip() == "":
         return None, None, error_response(400, "field 'name' is required")

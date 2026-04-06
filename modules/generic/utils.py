@@ -28,22 +28,24 @@ def is_unary(s):
     return True if s in ["+", "-", "!"] else False
 
 def add(a,b):
-    return a + b
+    return a.expr + b.expr
 def sub(a,b):
-    return a - b
+    return a.expr - b.expr
 def div(a,b):
-    return a / b
+    return a.expr // b.expr
 def mul(a,b):
-    return a * b
+    return a.expr * b.expr
 def _not(a):
-    return not a
+    return not a.expr
 def _or(a,b):
-    return a or b
+    return a.expr or b.expr
 def _xor(a,b):
-    return a ^ b
+    return a.expr ^ b.expr
 def _and(a,b):
     return a.expr and b.expr
+
 def eq(a, b):
+    print(a.expr == b.expr, a.expr, b.expr)
     return a.expr == b.expr
 
 def neg(a):
@@ -61,16 +63,14 @@ def le(a, b):
 def leq(a, b):
     return a.expr <= b.expr
 
-
 def geq(a, b):
-    print(a.expr, b.expr)
     return a.expr >= b.expr
 
 def mod(a, b):
-    return a % b
+    return a.expr % b.expr
 
 def neq(a,b):
-    return a != b
+    return a.expr != b.expr
 
 una = {
     "-": neg,
@@ -122,8 +122,8 @@ def read(path, mode = "rb"):
 def getmimetype(path):
     return mimetypes.guess_type(path)[0]
 
-def response(file):
-    return flask.Response(read(file), mimetype=getmimetype(file))
+def response(file, code = 200):
+    return flask.Response(read(file), mimetype=getmimetype(file), status=code)
 
 def CleanCode(code):
     b = True

@@ -31,7 +31,6 @@ def TokenizeSource(code,output):
                 continue
             
             ex = Expression(line)
-            print("-" * 8)
             line = ex.Token()
             line.put("line", p)
             lines.append(line)
@@ -49,6 +48,5 @@ def TokenizeSource(code,output):
             for j in line.tokens:
                 if j.type == INVALID:
                     output["Errors"].append(f"invalid token at line: {p}")
-                print(j.type,j.expr)
         
         return lines
