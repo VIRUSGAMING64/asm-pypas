@@ -23,6 +23,10 @@ async function submitCode(path) {
             code: editor.getValue()
         }
 
+        if (path == "run"){
+            document.querySelector(".output").innerText = "Excecuting..."
+        }
+        
         let response = await fetch("/api/" + path, {
             method: "POST",
             headers: {
@@ -30,6 +34,7 @@ async function submitCode(path) {
             },
             body: JSON.stringify(payload)
         })
+
         let data = await response.json()
 
         if (!response.ok) {

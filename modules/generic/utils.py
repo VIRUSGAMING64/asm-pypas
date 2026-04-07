@@ -45,7 +45,6 @@ def _and(a,b):
     return a.expr and b.expr
 
 def eq(a, b):
-    print(a.expr == b.expr, a.expr, b.expr)
     return a.expr == b.expr
 
 def neg(a):

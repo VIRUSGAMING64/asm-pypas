@@ -4,10 +4,8 @@ from modules.interpreter.Tokens import Token
 from modules.generic.utils import *
 import modules.interpreter.debug as debug
 from modules.interpreter.memory import *
-import time
 
 class ExprParser:
-
     def __init__(self, memory:Memory, out, globmem = None):
         self.memory     = memory
         self.out        = out
@@ -123,9 +121,6 @@ class ExprParser:
 
                 toks.tokens[i] = self.call(toks.tokens[i], args, self.memory)
 
-        for i in toks.tokens:
-            print(i.expr, end="")
-        print("")
         for elem in toks.tokens:
             if elem.type == COMMENT:
                 continue
@@ -183,8 +178,6 @@ class ExprParser:
         nums.append(Token(n, GetType(n)))
 
 
-
-
 class Evaluator:
     def __init__(self,structure:Token = None, start = None, output = {},memory = None, isfunc = False):
         self.pos        = start if start is not None else 0
@@ -201,14 +194,13 @@ class Evaluator:
     def run(self):
         code, ret   = self.step()
         while code != RETURNING:
-            print(f"Executed line: [{self.pos+1}]")
             if len(self.out['Errors']) >= 1:
                 break
 
             code, ret = self.step()
         
         #* esto es para debug solamente
-        if not self.isfunc:
+        if True or not self.isfunc:
             print("---" * 3, "memory audit", "---" * 3)
             audit = debug.audit_memory(self.memory)
             print(audit)
@@ -273,7 +265,6 @@ class Evaluator:
             except InterpreterMemoryError as e:
                 ExprParser(mem,self.out).evalTokens(line)
         except InterpreterException as e:
-            print(type(e))
             self.out["Errors"].append(e.GetError())
             return INVALID,None
         
@@ -291,20 +282,11 @@ class Evaluator:
     def execute_condition(self, line, mem):       
         value,err = ExprParser(mem,self.out).evalTokens(line.data["condition"])
         if len(value) != 1 or len(err) != 0:
-            print(err, value)
-            for t in value:
-                print(t.expr, t.data.get("name", None))
             raise Exception("Invalid condition")
         
         if not value[0].expr:
             newpos =self.pos + line.data["dx"]
-            print(self.Tree.tokens[newpos].expr)
             return self.jump(newpos),None #! el error es que tiene que coger la linea relativa al trozo !!!
-        
-        for i in line.tokens:
-            code,val = self.execute(i, mem)
-            if code == RETURNING:
-                return code, val
         
         return EMPTY, None
 
@@ -330,7 +312,6 @@ class Evaluator:
             
             try:
                 value = value[0].expr
-                print(line.tokens[1].expr)
                 mem.alloc_var(line.tokens[1].data["name"],value,False, isglob = not self.isfunc)
             except InterpreterMemoryError as e:
                 self.out["Errors"].append(e.GetError())
