@@ -77,25 +77,24 @@ class ExprParser:
         code = m_func.code        
         if len(m_func.args) != len(args):
             raise CallFuncException(elem)
-        p = {}
-        newmem = mem.copy()
+        
+        newmem = Memory() #* Aqui se crea un nuevo memory  segment para esta llamada
+        #* en el for se declaran en ese nuevo segmento las variables que se pasana como argumento
         for i,arg_name in enumerate(m_func.args):
             args[i] = Token(args[i], GetType(args[i]))
             args[i].data["name"] = arg_name
             newmem.alloc_var(
-                arg_name, args[i].expr, True
+                arg_name, args[i].expr, True, False
             )
-            p[arg_name] = False
+        
+        #* en este for las variables globales se pasan por referencia a la siguiente llamada de funcion
         for addr in mem.mem:
-            if p.get(addr, True) == False:
+            if mem.mem[addr].isglob == False:
                 continue
             newmem.mem[addr] = mem.mem[addr] #* Aqui lo que se hace es coger la referencia directa a las globales   
-      
-        #! aqui hay que pasarle que variables son globales !!! 
-        #! hay que saber si es una llamada de funcion el codigo que se ejecuta !!!
-        #! hay que poder cambiar el valor de las variables globales en el codigo de funciones !!       
+           
         ret = Evaluator(code, 0 , self.out, newmem, True).run()       
-        ret = Token(ret, NUMBER)
+        ret = Token(ret, GetType(ret))
         return ret 
 
     def _evalTokens(self,toks):
@@ -182,6 +181,9 @@ class ExprParser:
             #* se esta haciendo una asignacion de valor 
             n = a
         nums.append(Token(n, GetType(n)))
+
+
+
 
 class Evaluator:
     def __init__(self,structure:Token = None, start = None, output = {},memory = None, isfunc = False):
@@ -295,7 +297,7 @@ class Evaluator:
             raise Exception("Invalid condition")
         
         if not value[0].expr:
-            newpos=  line.data["eoif"]
+            newpos =self.pos + line.data["dx"]
             print(self.Tree.tokens[newpos].expr)
             return self.jump(newpos),None #! el error es que tiene que coger la linea relativa al trozo !!!
         
@@ -329,7 +331,7 @@ class Evaluator:
             try:
                 value = value[0].expr
                 print(line.tokens[1].expr)
-                mem.alloc_var(line.tokens[1].data["name"],value,False)
+                mem.alloc_var(line.tokens[1].data["name"],value,False, isglob = not self.isfunc)
             except InterpreterMemoryError as e:
                 self.out["Errors"].append(e.GetError())
                 return INVALID,None

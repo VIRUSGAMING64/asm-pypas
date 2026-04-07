@@ -16,15 +16,15 @@ def ex_func(output, memory,start, lines):
 
 def control(output, memory,start,lines):
     logging.log(logging.DEBUG,lines[start].expr)
-    eoif,code = extract(output, memory,start+1,lines)
+    dx,code = extract(output, memory,start+1,lines)
     cond = None
     try:
         cond = IF(start,lines[start],code)
     except Exception as e:
         output["Errors"].append(str(e))
         
-    logging.log(logging.DEBUG,start, eoif)
-    return  cond,eoif
+    logging.log(logging.DEBUG,start, dx)
+    return  cond,dx
 
 
 def extract(output,memory,start,lines):
@@ -38,10 +38,11 @@ def extract(output,memory,start,lines):
             i+=1
             continue
         elif line.tokens[0].expr == "if":
-            cond,i = control(output,memory,i,lines)
+            cond,dx = control(output,memory,i,lines)
             if cond != None:
                 tk = cond.Token()
-                tk.data["eoif"] = i
+                tk.data["dx"] = dx-i
+                i = dx
                 structure.tokens.append(tk)
                 for tok in cond.code.tokens:
                     structure.tokens.append(tok)

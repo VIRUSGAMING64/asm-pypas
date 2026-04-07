@@ -1,10 +1,11 @@
 from modules.interpreter.Exceptions import *
 from modules.interpreter.t_statics import *
 class mem_Var:
-    def __init__(self, name, value):
+    def __init__(self, name, value, isglob):
         self.name  = name
         self.value = value
         self.type  = VARIABLES
+        self.isglob = isglob
 
 class mem_Func:
     def __init__(self, name, args, code):
@@ -13,6 +14,7 @@ class mem_Func:
         self.code  = code
         self.value = f"function at [{name}]"
         self.type  = FUNC 
+        self.isglob = True #* las funciones siempre se declaran globales en donde esten
 
 class Memory:
     def __init__(self,memory_map = None , max_alloc=-1):
@@ -22,14 +24,14 @@ class Memory:
     def copy(self):
         return Memory(self.mem.copy(), self.max_alloc)
 
-    def alloc_var(self, addr,value, overwrite = False):
+    def alloc_var(self, addr,value, overwrite = False, isglob = True):
         val = self.mem.get(addr,None)
 
         if not overwrite and val != None:
             raise InterpreterMemoryError(f"Overwrite addr [{addr}]")
         
         self.mem[addr] = mem_Var(
-            addr, value
+            addr, value, isglob
         )
 
     def Put(self, addr, value):
