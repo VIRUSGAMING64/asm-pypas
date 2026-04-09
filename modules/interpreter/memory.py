@@ -1,11 +1,17 @@
 from modules.interpreter.Exceptions import *
 from modules.interpreter.t_statics import *
+import modules.interpreter.builtin as in_builtin
+
+
 class mem_Var:
     def __init__(self, name, value, isglob):
         self.name  = name
         self.value = value
         self.type  = VARIABLES
         self.isglob = isglob
+
+    def copy(self):
+        return mem_Var(self.name, self.value, self.isglob)
 
 class mem_Func:
     def __init__(self, name, args, code):
@@ -16,10 +22,31 @@ class mem_Func:
         self.type  = FUNC 
         self.isglob = True #* las funciones siempre se declaran globales en donde esten
 
+    def copy(self):
+        return mem_Func(self.name, self.args.copy(), self.code.copy())
+
+
+
 class Memory:
     def __init__(self,memory_map = None , max_alloc=-1):
         self.mem = {} if memory_map is None else memory_map
         self.max_alloc = max_alloc
+        self.__init_builtins()
+
+
+    def __setitem__(self, key, value):
+        self.mem[key] = value
+
+    def __getitem__(self, key):
+        return self.mem.__getitem__(key)
+
+    def __init_builtins(self):
+        for name, args in in_builtin.__builtins_funcs__:
+            try:
+                self.alloc_func(name, args, BUILTIN)
+                self.mem[name].isglob = False
+            except:
+                print("ya allocated")
 
     def copy(self):
         return Memory(self.mem.copy(), self.max_alloc)
@@ -54,6 +81,7 @@ class Memory:
     def alloc_func(self,addr, args, code):
         val = self.mem.get(addr,None)
         if val != None:
+            print(val.name)
             raise InterpreterMemoryError(f"Overwrite addr [{addr}]")
         
         self.mem[addr] = mem_Func(addr,args, code)

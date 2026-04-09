@@ -1,26 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interpreter | API Reference</title>
+    <title>ASM-PyPas | API Reference</title>
     <link rel="stylesheet" href="/gui/styles.css">
     <link rel="stylesheet" href="/gui/lib/iconfont/material-icons.css">
     <link rel="icon" type="image/svg+xml" href="/gui/favicon.svg">
     <script src="/gui/lib/tailwind.js"></script>
 </head>
-<body class="bg-indigo-500 h-screen max-h-screen">
-    <div class="bg-neutral-950/95 w-full h-screen flex flex-col">
+<body class="bg-indigo-500 min-h-screen max-h-screen">
+    <div class="bg-neutral-950/95 w-full min-h-screen flex flex-col">
         <div class="p-3">
             <div class="bg-indigo-300/5 w-full h-12 rounded-full p-2 flex items-center">
-                <div class="pl-3 text-white/70 font-google">interpreter api</div>
+                <div class="pl-3 text-white/70 font-google">asm-pypas api</div>
                 <div class="w-full flex justify-end gap-2">
-                    <a href="/" class="h-8 px-4 rounded-full bg-indigo-500 hover:bg-indigo-600 text-black/80 text-sm font-google flex items-center">
-                        Home
-                    </a>
-                    <a href="/api" class="h-8 px-4 rounded-full bg-indigo-500 hover:bg-indigo-600 text-black/80 text-sm font-google flex items-center">
-                        Refresh
-                    </a>
+                    <a href="/" class="h-8 px-4 rounded-full bg-indigo-500 hover:bg-indigo-600 text-black/80 text-sm font-google flex items-center">Home</a>
+                    <a href="/api" class="h-8 px-4 rounded-full bg-indigo-500 hover:bg-indigo-600 text-black/80 text-sm font-google flex items-center">Refresh</a>
                 </div>
             </div>
         </div>
@@ -34,7 +30,7 @@
                     </div>
                 </div>
 
-                <div class="px-6 pb-6 h-full overflow-y-scroll text-white/90 font-monospace">
+                <div class="px-6 pb-6 h-full overflow-y-auto text-white/90 font-monospace">
                     <div class="rounded-2xl bg-white/5 p-4 border border-white/10 mb-3">
                         <div class="text-white/80">Base URL</div>
                         <div class="text-indigo-300 mt-1">http://localhost:8000</div>
@@ -44,52 +40,67 @@
                         <div class="rounded-2xl bg-white/5 p-4 border border-white/10">
                             <div class="text-indigo-300 mb-1">POST /api/run</div>
                             <div class="text-white/60">Body JSON: {"name": "file.asm", "code": "..."}</div>
-                            <div class="text-white/40 mt-1">Ejecuta el codigo y devuelve la salida.</div>
-                            <div class="text-white/40">Errores posibles: 400, 404, 500.</div>
+                            <div class="text-white/40 mt-1">Ejecuta el código y devuelve el resultado del intérprete.</div>
+                            <div class="text-white/40">Errores comunes: 400, 404, 500.</div>
                         </div>
 
                         <div class="rounded-2xl bg-white/5 p-4 border border-white/10">
                             <div class="text-indigo-300 mb-1">POST /api/save</div>
                             <div class="text-white/60">Body JSON: {"name": "file.asm", "code": "..."}</div>
-                            <div class="text-white/40 mt-1">Guarda el archivo en memoria y disco.</div>
+                            <div class="text-white/40 mt-1">Guarda el archivo en memoria y en disco.</div>
                             <div class="text-white/40">Respuesta: {"status":"ok"}.</div>
+                        </div>
+
+                        <div class="rounded-2xl bg-white/5 p-4 border border-white/10">
+                            <div class="text-indigo-300 mb-1">GET /api/getcode?name=&lt;file&gt;</div>
+                            <div class="text-white/60">Query param: name</div>
+                            <div class="text-white/40 mt-1">Devuelve el contenido de un archivo concreto.</div>
+                            <div class="text-white/40">Respuesta: {"status":"ok","code":"..."}.</div>
                         </div>
 
                         <div class="rounded-2xl bg-white/5 p-4 border border-white/10">
                             <div class="text-indigo-300 mb-1">POST /api/getcode?name=&lt;file&gt;</div>
                             <div class="text-white/60">Query param: name</div>
-                            <div class="text-white/40 mt-1">Devuelve un archivo puntual.</div>
-                            <div class="text-white/40">Respuesta: {"status":"ok","code":"..."}.</div>
-                        </div>
-
-                        <div class="rounded-2xl bg-white/5 p-4 border border-white/10">
-                            <div class="text-indigo-300 mb-1">GET /api/getcodes?name=&lt;file&gt;</div>
-                            <div class="text-white/60">Query param: name</div>
-                            <div class="text-white/40 mt-1">Retorna estado y contenido del archivo.</div>
+                            <div class="text-white/40 mt-1">La misma ruta también acepta POST por compatibilidad.</div>
                             <div class="text-white/40">Respuesta: {"status":"ok","code":"..."}.</div>
                         </div>
 
                         <div class="rounded-2xl bg-white/5 p-4 border border-white/10">
                             <div class="text-indigo-300 mb-1">GET /api/initcodes</div>
-                            <div class="text-white/60">No params</div>
-                            <div class="text-white/40 mt-1">Lista nombres de codigos disponibles.</div>
+                            <div class="text-white/60">Sin parámetros</div>
+                            <div class="text-white/40 mt-1">Lista los nombres disponibles dentro de codes/.</div>
                             <div class="text-white/40">Respuesta: {"status":"ok","names":[...]}</div>
                         </div>
 
                         <div class="rounded-2xl bg-white/5 p-4 border border-white/10">
                             <div class="text-indigo-300 mb-1">GET /api/newcode?name=&lt;file&gt;</div>
                             <div class="text-white/60">Query param: name</div>
-                            <div class="text-white/40 mt-1">Crea una entrada de codigo vacia.</div>
+                            <div class="text-white/40 mt-1">Crea una entrada vacía y la deja lista para editar.</div>
                             <div class="text-white/40">Respuesta: {"status":"ok","code":""}.</div>
                         </div>
 
                         <div class="rounded-2xl bg-white/5 p-4 border border-white/10 md:col-span-2">
                             <div class="text-indigo-300 mb-1">GET /api/delcurr?name=&lt;file&gt;</div>
                             <div class="text-white/60">Query param: name</div>
-                            <div class="text-white/40 mt-1">Elimina el archivo actual.</div>
-                            <div class="text-white/40">Respuesta: {"status":"ok"}.</div>
+                            <div class="text-white/40 mt-1">Elimina el archivo actual del almacenamiento.</div>
+                            <div class="text-white/40">Respuesta: {"status":"ok"} o {"status":"fail"}.</div>
                         </div>
                     </div>
+
+                    <div class="mt-4 grid md:grid-cols-2 gap-3 text-sm">
+                        <div class="rounded-2xl bg-white/5 p-4 border border-white/10">
+                            <div class="text-indigo-300 mb-1">Respuestas</div>
+                            <div class="text-white/40 mt-1">Éxito: {"status":"ok"} o {"status":"ok","code":"..."}.</div>
+                            <div class="text-white/40">Error: {"status":"fail","message":"..."}.</div>
+                        </div>
+
+                        <div class="rounded-2xl bg-white/5 p-4 border border-white/10">
+                            <div class="text-indigo-300 mb-1">Validación</div>
+                            <div class="text-white/40 mt-1">Los nombres de archivo se validan para evitar path traversal.</div>
+                            <div class="text-white/40">El servidor limita el payload JSON a 128 MB de código.</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

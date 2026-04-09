@@ -15,7 +15,7 @@ class InterpreterException(BaseException):
             return "UNKNOW"
         if isinstance(self.line , int):
             return self.line
-        self.line = self.line.data["line"]
+        self.line = self.line.data.get("line", None)
         return self.line
     
 class InvalidTokenException(InterpreterException):
@@ -67,4 +67,10 @@ class CallFuncException(InterpreterException):
 
     def GetError(self):
         return f"function call exception[{self.line}]"
+
+class ExpresionException(InterpreterException):
+    def __init__(self, line, *args):
+        super().__init__(line, *args)
     
+    def GetError(self):
+        return f"[INVALID EXPRESSION AT LINE {self.GetLine()}]"

@@ -23,6 +23,7 @@ def run():
 
         exe = interpreter.MainHandler(code.decode())
         out = exe.run()
+        del exe
         return out, 200
     
     except Exception as e:

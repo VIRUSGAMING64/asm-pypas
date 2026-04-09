@@ -5,87 +5,93 @@ ASM-PyPas es un intérprete experimental con interfaz web. Combina un backend en
 ## ✨ Resumen
 
 - 🌐 Backend HTTP con Flask para UI y API.
-- 🧠 Motor de interpretación (tokenización, estructuras y ejecución básica).
+- 🧠 Motor de interpretación con tokenización, parser y ejecución básica.
 - 📝 Editor web con CodeMirror para administrar archivos en `codes/`.
 
 ## ✅ Estado Actual
 
 Actualmente el proyecto permite:
 
-- 📁 Crear y eliminar archivos desde la interfaz.
-- 🔄 Cargar archivos existentes al abrir la app.
+- 📁 Crear, abrir y eliminar archivos desde la interfaz.
+- 🔄 Cargar los archivos existentes al abrir la aplicación.
 - 💾 Guardar cambios automáticamente.
-- ▶️ Ejecutar código vía API y mostrar resultado/errores.
+- ▶️ Ejecutar código vía API y mostrar salida o errores.
 
 ## 🏗️ Arquitectura
 
 - ⚙️ `main.py`: punto de entrada del servidor.
-- 🧩 `modules/interpreter`: parser, tokens, memoria y evaluación.
-- 🔌 `modules/web`: rutas web, API y utilidades.
-- 🛠️ `modules/generic`: helpers compartidos.
-- 🖥️ `gui`: frontend estático.
-- 📂 `codes`: almacenamiento de código editable.
+- 🧩 `modules/interpreter`: tokens, parser, estructuras y ejecución.
+- 🔌 `modules/web`: rutas web, API y utilidades compartidas.
+- 🛠️ `modules/generic`: helpers comunes.
+- 🖥️ `gui`: frontend estático y documentación de API.
+- 📂 `codes`: almacenamiento de archivos editables.
+- 🧪 `scripts`: utilidades auxiliares para limpieza y arranque.
 
-## 🌳 Estructura Completa Del Repositorio
+## 🌳 Estructura del repositorio
 
 ```text
 asm-pypas/
-|- .clean
-|- .gitignore
-|- .todo
-|- README.md
-|- informe.md
-|- main.py
-|- requirements.txt
-|- codes/
-|  |- perror
-|- docs/
-|  |- LangReference.pdf
-|  |- LangReference.tex
-|  |- informe.pdf
-|  |- informe.tex
-|- gui/
-|  |- 404.html
-|  |- api.html
-|  |- favicon.svg
-|  |- index.html
-|  |- main.js
-|  |- styles.css
-|- modules/
-|  |- __init__.py
-|  |- generic/
-|  |  |- utils.py
-|  |- interpreter/
-|  |  |- __init__.py
-|  |  |- debug.py
-|  |  |- Exceptions.py
-|  |  |- Expression.py
-|  |  |- mainhandler.py
-|  |  |- memory.py
-|  |  |- structures.py
-|  |  |- t_statics.py
-|  |  |- Tokens.py
-|  |- web/
-|     |- __init__.py
-|     |- index.py
-|     |- api/
-|     |  |- endpoints.py
-|     |- core/
-|        |- config.py
-|        |- errors.py
-|        |- saver.py
-|        |- utils.py
-|- scripts/
-|  |- clean
-|  |- clean.cpp
-|  |- run.sh
+├── Dockerfile
+├── README.md
+├── l.py
+├── m.cpp
+├── main
+├── main.py
+├── requirements.txt
+├── codes/
+├── docs/
+│   ├── LangReference.tex
+│   └── informe.tex
+├── gui/
+│   ├── favicon.svg
+│   ├── html/
+│   │   ├── 404.html
+│   │   ├── api.html
+│   │   └── index.html
+│   ├── lib/
+│   │   ├── google-sans.ttf
+│   │   ├── tailwind.js
+│   │   ├── codemirror/
+│   │   └── iconfont/
+│   ├── main.js
+│   └── styles.css
+├── modules/
+│   ├── __init__.py
+│   ├── generic/
+│   │   └── utils.py
+│   ├── interpreter/
+│   │   ├── Exceptions.py
+│   │   ├── Expression.py
+│   │   ├── ExprParser.py
+│   │   ├── Tokens.py
+│   │   ├── builtin.py
+│   │   ├── debug.py
+│   │   ├── mainhandler.py
+│   │   ├── memory.py
+│   │   ├── structures.py
+│   │   ├── t_statics.py
+│   │   └── utils.py
+│   └── web/
+│       ├── __init__.py
+│       ├── index.py
+│       ├── api/
+│       │   └── endpoints.py
+│       └── core/
+│           ├── config.py
+│           ├── errors.py
+│           ├── saver.py
+│           └── utils.py
+└── scripts/
+	├── clean
+	├── clean.cpp
+	└── run.sh
 ```
 
 ## 📋 Requisitos
 
 - 🐍 Python 3.10 o superior.
 - 📦 pip.
-- ✅ Dependencia actual: `flask`.
+- ✅ Dependencia actual: Flask.
 
 ## 🛠️ Instalación
 
@@ -100,13 +106,13 @@ pip install -r requirements.txt
 
 ## ▶️ Ejecución
 
-Opción 1 (directa):
+Opción 1, directa:
 
 ```bash
 python3 main.py
 ```
 
-Opción 2 (script):
+Opción 2, con script:
 
 ```bash
 bash scripts/run.sh
@@ -117,33 +123,35 @@ Servidor:
 - 🌍 http://127.0.0.1:8000
 - 🌍 http://localhost:8000
 
-## 🔄 Flujo De Uso
+## 🔄 Flujo de uso
 
 1. Abre la aplicación en el navegador.
-2. Crea un archivo nuevo con el botón `+`.
+2. Crea o selecciona un archivo.
 3. Escribe código en el editor.
 4. El contenido se guarda automáticamente.
 5. Ejecuta con el botón Play para ver salida y errores.
 
 ## 🔗 API
 
-Rutas principales:
+Rutas disponibles:
 
 - `GET /`: interfaz principal.
-- `GET /api`: vista de API.
-- `GET /gui/<subpath>`: recursos estáticos.
-- `POST /api/run`: ejecuta código. JSON: `{ "name": string, "code": string }`.
-- `POST /api/save`: guarda código. JSON: `{ "name": string, "code": string }`.
-- `POST /api/getcode?name=<archivo>`: obtiene contenido de un archivo.
-- `GET /api/getcodes?name=<archivo>`: obtiene contenido de un archivo.
-- `GET /api/initcodes`: lista nombres disponibles en `codes/`.
-- `GET /api/newcode?name=<archivo>`: crea entrada vacía.
-- `GET /api/delcurr?name=<archivo>`: elimina archivo actual.
+- `GET /api`: página de referencia de API.
+- `GET /gui/<subpath>`: recursos estáticos del frontend.
+- `POST /api/run`: ejecuta código. JSON: `{ "name": "file.asm", "code": "..." }`.
+- `POST /api/save`: guarda código. JSON: `{ "name": "file.asm", "code": "..." }`.
+- `GET /api/getcode?name=<archivo>`: obtiene el contenido de un archivo.
+- `POST /api/getcode?name=<archivo>`: también acepta el mismo acceso para compatibilidad.
+- `GET /api/initcodes`: lista los nombres disponibles en `codes/`.
+- `GET /api/newcode?name=<archivo>`: crea una entrada vacía.
+- `GET /api/delcurr?name=<archivo>`: elimina el archivo actual.
 
-Notas técnicas:
+Respuestas y validación:
 
-- 🛡️ Validación de nombre de archivo para reducir riesgo de path traversal.
-- 📏 Límite de payload configurado en servidor (base: 128 MB de código).
+- `success`: normalmente devuelve `{"status": "ok"}` o `{"status": "ok", "code": "..."}`.
+- `error`: devuelve `{"status": "fail", "message": "..."}` con el código HTTP correspondiente.
+- Los nombres de archivo se validan para evitar path traversal.
+- El servidor limita el payload JSON a 128 MB de código.
 
 ## 🧰 Scripts
 
@@ -160,10 +168,11 @@ python3 main.py
 
 ## 📚 Documentación
 
-La documentación técnica estará en `docs/`.
+- La documentación técnica está en `docs/`.
+- La referencia rápida de endpoints está en `gui/html/api.html`.
 
-## ⚠️ Limitaciones Actuales
+## ⚠️ Limitaciones actuales
 
-- El intérprete sigue en evolución y no cubre un lenguaje completo.
 - Algunas salidas siguen orientadas a depuración.
+- Existen algunos bugs conocidos sin solucionar
 - No hay suite formal de tests automatizados en el repositorio.

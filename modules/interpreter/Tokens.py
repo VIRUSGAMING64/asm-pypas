@@ -2,15 +2,12 @@ from modules.generic.utils import *
 from modules.interpreter.t_statics import *
 import functools
 
-@functools.lru_cache()
 def Tokenize(code: str) -> list[Token]:
-
     pos = 0
     act_tok = ""
     tokens = []
     start_str = None
     in_str = False
-
     while pos <= len(code):
 
         if (pos < len(code)) and ((not code[pos] in operators) or in_str):
@@ -70,7 +67,6 @@ def Tokenize(code: str) -> list[Token]:
 
         pos += 1
 
-
     line_tokens = []
     for i in range(len(tokens)):
         line:Token = tokens[i]
@@ -85,12 +81,16 @@ def Tokenize(code: str) -> list[Token]:
             
     return line_tokens
 
+
 class Token:
-    def __init__(self,expr, type = NIL, tokens = None):
+    def __init__(self,expr, type = NIL, tokens = None, data = {}):
         self.expr:str = expr
         self.type = type
         self.tokens  = tokens
-        self.data = {}
+        self.data = data
+
+    def copy(self):
+        return Token(self.expr, self.type, self.tokens.copy(), self.data.copy())
 
     def __dict__(self):
         di = {}

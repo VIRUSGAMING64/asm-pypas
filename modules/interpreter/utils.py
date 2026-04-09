@@ -52,9 +52,9 @@ def extract(output,memory,start,lines):
                 if func != None:
                     memory.alloc_func(func.name, func.novars, func.code)
                     structure.tokens.append(func.Token())
-            except Exception as e:
+            except InterpreterException as e:
                 logging.log(logging.DEBUG,e)
-                output["Errors"].append(f"Overwriting function address [{line.get('line','unknow')}]")
+                output["Errors"].append(f"Overwriting [{func.name}] function address at line [{line.get('line','unknow')}]")
         else:
             logging.log(logging.DEBUG,"added",line.expr)
             structure.tokens.append(line)   

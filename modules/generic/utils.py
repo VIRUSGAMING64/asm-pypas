@@ -4,7 +4,6 @@ from ..interpreter.t_statics import *
 import functools
 import logging
 
-@functools.lru_cache()
 def getPrio(expr):
     if expr.data.get("neg", False):
         return 3
@@ -20,7 +19,6 @@ def getPrio(expr):
 def isdelim(s):
     return True if s == " " else False
 
-@functools.lru_cache()
 def is_operator(s):
     return True if s in operations else False
 
@@ -154,4 +152,5 @@ def GetType(p):
         return NUMBER
     elif isinstance(p, str):
         return STRING
+    assert p != None
     return p.type

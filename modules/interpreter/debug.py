@@ -1,6 +1,8 @@
 
 from .Tokens import Token
 
+DEBUG = True
+
 def dst(structure:Token,prof = 0):
     print(prof * " ",end = "")
     print(structure.expr)
@@ -17,3 +19,4 @@ def audit_memory(mem):
     for addr in mem.mem:
         s += str((addr, mem.query(addr))) + "\n"
     return s
+

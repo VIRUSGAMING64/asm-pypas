@@ -27,14 +27,12 @@ class ExprParser:
             if tokens[j].expr == "(":
                 opens += 1
                 arg.append(tokens[j])
-            
             elif tokens[j].expr == ",":
                 if opens == 1:    
                     args.append(arg)
                     arg = []
                 else:
                     arg.append(tokens[j])
-
             elif tokens[j].expr == ")":
                 opens -= 1
                 arg.append(tokens[j])
@@ -67,18 +65,34 @@ class ExprParser:
                 tokens.insert(i, func)
 
     def call(self, elem, args:list, mem:Memory):
+
         m_func = mem.query(elem.data["name"])
-        
         if m_func.type != FUNC:
             raise InterpreterMemoryError(f"No function at addr [{m_func.name}]")
 
-        code = m_func.code        
+        code = m_func.code      
+
         if len(m_func.args) != len(args):
             raise CallFuncException(elem)
         
-        newmem = Memory() #* Aqui se crea un nuevo memory  segment para esta llamada
+
+        if code == BUILTIN:
+            name = m_func.name
+            ret = in_builtin.__builtins_calls__[name](*args)
+            if ret == None:
+                ret = 0
+            return Token(ret, GetType(ret))
+
+
+        newmem = Memory() 
+        #* Aqui se crea un nuevo memory  segment para esta llamada
         #* en el for se declaran en ese nuevo segmento las variables que se pasana como argumento
         for i,arg_name in enumerate(m_func.args):
+            if isinstance(args[i], mem_Func | mem_Var):
+                newmem[arg_name] = args[i].copy()
+                newmem[arg_name].name = arg_name
+                continue
+        
             args[i] = Token(args[i], GetType(args[i]))
             args[i].data["name"] = arg_name
             newmem.alloc_var(
@@ -95,16 +109,18 @@ class ExprParser:
         ret = Token(ret, GetType(ret))
         return ret 
 
-    def _evalTokens(self,toks):
-        if isinstance(toks, list):
-            toks = Token("__sourcecode__", LINE , toks)
-        
+    def _evalTokens(self,ev_tokens):
+        #toks = ev_tokens.copy()
+        if isinstance(ev_tokens, list):
+            toks = Token("__sourcecode__", LINE , ev_tokens)
+
         nums    = []
         oper    = []
         unary   = True 
 
         self.extract_funcs_call(toks)
-
+        for to in toks.tokens:
+            print(to.expr)
 
         for i in range(len(toks.tokens)):
             if toks.tokens[i].type == FUNCCALL:
@@ -118,7 +134,6 @@ class ExprParser:
                         raise InterpreterException(toks) 
                     arg = out[0][0].expr
                     args.append(arg)
-
                 toks.tokens[i] = self.call(toks.tokens[i], args, self.memory)
 
         for elem in toks.tokens:
@@ -159,6 +174,12 @@ class ExprParser:
         while len(oper):
             self.process(nums,oper)
 
+
+        if len(nums) != 1:
+            for i in nums:
+                print(i.expr)
+            raise ExpresionException(toks)
+
         return nums,oper
 
     def process(self, nums, oper):
@@ -175,6 +196,7 @@ class ExprParser:
         if n == None:
             #* se esta haciendo una asignacion de valor 
             n = a
+
         nums.append(Token(n, GetType(n)))
 
 
@@ -186,28 +208,26 @@ class Evaluator:
         self.Tree       = structure
         self.memory     = memory
         self.isfunc     = isfunc
-
         if self.Tree is None:
             raise Exception("The source tree is None")
-
-
+        
     def run(self):
         code, ret   = self.step()
         while code != RETURNING:
             if len(self.out['Errors']) >= 1:
                 break
-
+            li = self.Tree.tokens[self.pos].data.get("line", "UNKNOW")
             code, ret = self.step()
+
+            print("Excecuted line:", li)
         
         #* esto es para debug solamente
-        if True or not self.isfunc:
+        if debug.DEBUG:
             print("---" * 3, "memory audit", "---" * 3)
             audit = debug.audit_memory(self.memory)
             print(audit)
             self.out["result"] = audit
-
         return ret
-
 
     def step(self):
         try:
@@ -220,7 +240,6 @@ class Evaluator:
                 return RETURNING, 0 #! valor dafault para retorno de una funcion
             elif retcode == RETURNING:
                 return retcode,out
-
         except InterpreterMemoryError as e:
             self.out["Errors"].append(e.GetError())
             return INVALID,None
@@ -228,25 +247,31 @@ class Evaluator:
 
     def execute(self, line, mem):
         if line.tokens == None:
+            print("debug none: ",line.expr)
             return EMPTY,None
-
+        
         if len(line.tokens) == 0:
+            print("debug zero: ",line.expr)
             return EMPTY,None
-
+        
         if line.type == CONDITION:
             return self.execute_condition(line, mem.copy())
+        
         elif line.tokens[0].expr == 'var':
             try:
                 self.variable_declaration(line,mem=mem)
             except DeclarationException as e:
                 self.out["Errors"].append(e.GetError())
+        
         elif line.tokens[0].type == LABEL:
             return EMPTY,None
+        
         elif line.tokens[0].expr == "goto":
             try:
                 return self.find_label(line, line.tokens[1].expr),None
             except GotoException as e:
                 self.out["Errors"].append(e.GetError())
+        
         elif line.tokens[0].expr == "ret":
             to_Eval = line.tokens[1:]
             value,err = ExprParser(mem,self.out).evalTokens(to_Eval)        
@@ -254,20 +279,25 @@ class Evaluator:
                 raise InterpreterException("Return funcion value error")
             return RETURNING,value[0].expr            
         else:
+            print("debug line: ",line.expr)
             return self.run_line(line, mem)
         
         return EMPTY,None
         
     def run_line(self, line , mem):
+        if line.type ==  FUNC:
+            print("debug func: ", line.expr)
+            return EMPTY, None #* esto es para no evaluar las declaraciones de funciones 
+        #* ya que la funcion en si es un token que se intenta evaluar
         try:
             try: #* esto es asi porque primero se intentan usar las variables globales en la linea
                 ExprParser(self.memory,self.out).evalTokens(line)
             except InterpreterMemoryError as e:
+                print("global error: ",e)
                 ExprParser(mem,self.out).evalTokens(line)
         except InterpreterException as e:
             self.out["Errors"].append(e.GetError())
             return INVALID,None
-        
         return EMPTY, None
 
     def find_label(self,line , name):
@@ -280,13 +310,14 @@ class Evaluator:
         raise GotoException(line)
     
     def execute_condition(self, line, mem):       
-        value,err = ExprParser(mem,self.out).evalTokens(line.data["condition"])
+        cond = line.data["condition"]
+        value,err = ExprParser(mem,self.out).evalTokens(cond)
         if len(value) != 1 or len(err) != 0:
             raise Exception("Invalid condition")
         
         if not value[0].expr:
             newpos =self.pos + line.data["dx"]
-            return self.jump(newpos),None #! el error es que tiene que coger la linea relativa al trozo !!!
+            return self.jump(newpos),None 
         
         return EMPTY, None
 
@@ -297,6 +328,13 @@ class Evaluator:
     def variable_declaration(self, line, mem:Memory):
         try:
             try:
+                def isarraydecl(line):
+                    if len(line.tokens) < 5 or line.tokens[1].type != VARIABLES or line.tokens[2].expr != "[":
+                        return False
+                    #! aqui hay que extraer el array decl
+
+                #if isarraydecl()
+
                 if len(line.tokens) < 3 or line.tokens[1].type != VARIABLES or line.tokens[2].expr != "=":
                     raise DeclarationException(VARIABLES, line, [])
             
@@ -322,6 +360,11 @@ class Evaluator:
                 e.line = line
                 self.out["Errors"].append(e.GetError())
                 return INVALID,None
-
+            elif isinstance(e, InterpreterMemoryError):
+                e.line = line
+                self.out["Errors"].append(e.GetError())
+                return INVALID, None
+            
             self.out["Errors"].append(f"python exception at line [{line.data["line"]}]:[{str(e)}]")
+        
         return VARIABLES,None
