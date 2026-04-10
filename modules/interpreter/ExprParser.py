@@ -200,9 +200,9 @@ class ExprParser:
 
 
 class Evaluator:
-    def __init__(self,structure:Token = None, start = None, output = {},memory = None, isfunc = False):
+    def __init__(self,structure:Token = None, start = None, output = None,memory = None, isfunc = False):
         self.pos        = start if start is not None else 0
-        self.out        = output
+        self.out        = {} if output is None else output
         self.exceptions = []
         self.Tree       = structure
         self.memory     = memory

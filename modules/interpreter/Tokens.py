@@ -3,11 +3,11 @@ from modules.interpreter.t_statics import *
 import functools
 
 class Token:
-    def __init__(self,expr, type = NIL, tokens = [], data = {}):
+    def __init__(self,expr, type = NIL, tokens = None, data = None):
         self.expr:str = expr
         self.type = type
-        self.tokens  = tokens
-        self.data = data
+        self.tokens  = [] if tokens is None else tokens
+        self.data = {} if data is None else dict(data)
         self.data["name"] = self.expr
 
     def __dict__(self):
@@ -23,6 +23,17 @@ class Token:
                 tok.append(target)
         di["tokens"] = tok
         return di
+
+    def copy(self):
+        tok = self.tokens
+        if isinstance(self.tokens, list):
+            tok = []
+            for target in self.tokens:
+                if isinstance(target, Token):
+                    tok.append(target.copy())
+                else:
+                    tok.append(target)
+        return Token(self.expr, self.type, tok, self.data.copy())
 
     def get(self,key,default):
         return self.data.get(key,default)
