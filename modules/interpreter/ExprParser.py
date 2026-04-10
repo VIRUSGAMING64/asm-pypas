@@ -110,10 +110,9 @@ class ExprParser:
         return ret 
 
     def _evalTokens(self,ev_tokens):
-        #toks = ev_tokens.copy()
-        if isinstance(ev_tokens, list):
-            toks = Token("__sourcecode__", LINE , ev_tokens)
-
+        toks = ev_tokens.copy()
+        if isinstance(toks, list):
+            toks = Token(None, LINE , toks)
         nums    = []
         oper    = []
         unary   = True 
@@ -328,21 +327,11 @@ class Evaluator:
     def variable_declaration(self, line, mem:Memory):
         try:
             try:
-                def isarraydecl(line):
-                    if len(line.tokens) < 5 or line.tokens[1].type != VARIABLES or line.tokens[2].expr != "[":
-                        return False
-                    #! aqui hay que extraer el array decl
-
-                #if isarraydecl()
-
                 if len(line.tokens) < 3 or line.tokens[1].type != VARIABLES or line.tokens[2].expr != "=":
                     raise DeclarationException(VARIABLES, line, [])
             
                 value,err = ExprParser( mem, self.out).evalTokens(line.tokens[3:])
             
-                if len(value) != 1 or len(err) != 0:
-                    raise DeclarationException(VARIABLES, line, [])
-                
             except DeclarationException as e:
                 if isinstance(e, DeclarationException):
                     self.out["Errors"].append(e.GetError())

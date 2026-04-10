@@ -29,8 +29,8 @@ def control(output, memory,start,lines):
 
 def extract(output,memory,start,lines):
     i = start
-    structure = Token("__source_code__")
-    structure.tokens = []
+    structure = Token("__source_code__", NIL, [], {})
+    
     while i < len(lines):
         line = lines[i]
         if len(line.tokens) == 0:

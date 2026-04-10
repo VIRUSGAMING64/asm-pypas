@@ -1,5 +1,5 @@
 from .Tokens import *
-from .Expression import *
+from .Lexer import *
 import modules.interpreter.debug as debug
 
 class IF: 
@@ -67,6 +67,7 @@ class FUNCS:
 
         self.novars = novars
         self.name = toks[1].data["name"]
+
         print(novars,set(novars))
         if len(novars) != len(set(novars)):
             raise Exception(f"Invalid function declaration at line [{self.i}]")
