@@ -16,3 +16,8 @@ docs
 .clean
 .gitignore
 out.txt
+tests/
+informes/
+.github/
+.pytest_cache/
+venv/

@@ -1,7 +1,7 @@
 
 import logging
 
-class InterpreterException(BaseException):
+class InterpreterException(Exception):
     def __init__(self, line, *args):
         super().__init__(*args)
         self.line = line
@@ -73,4 +73,11 @@ class ExpresionException(InterpreterException):
         super().__init__(line, *args)
     
     def GetError(self):
-        return f"[INVALID EXPRESSION AT LINE {self.GetLine()}]"
+        return f"[INVALID EXPRESSION AT LINE {self.GetLine()}]"   
+    
+class LoopException(InterpreterException):
+    def __init__(self, line, *args):
+        super().__init__(line, *args)
+    
+    def GetError(self):
+        return f"[Error excecuting loop {self.GetLine()}]"

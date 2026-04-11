@@ -1,5 +1,5 @@
 from modules.interpreter.Exceptions import *
-from modules.interpreter.t_statics import *
+from modules.interpreter.statics_values import *
 import modules.interpreter.builtin as in_builtin
 
 
@@ -28,10 +28,11 @@ class mem_Func:
 
 
 class Memory:
-    def __init__(self,memory_map = None , max_alloc=-1):
+    def __init__(self,memory_map = None , max_alloc=-1, skip_builtins=False):
         self.mem = {} if memory_map is None else memory_map
         self.max_alloc = max_alloc
-        self.__init_builtins()
+        if not skip_builtins:
+            self.__init_builtins()
 
 
     def __setitem__(self, key, value):
@@ -45,11 +46,11 @@ class Memory:
             try:
                 self.alloc_func(name, args, BUILTIN)
                 self.mem[name].isglob = False
-            except:
-                print("ya allocated")
+            except Exception  as e:
+                print("ya allocted: ",e)
 
     def copy(self):
-        return Memory(self.mem.copy(), self.max_alloc)
+        return Memory(self.mem.copy(), self.max_alloc, skip_builtins=True)
 
     def alloc_var(self, addr,value, overwrite = False, isglob = True):
         val = self.mem.get(addr,None)
@@ -71,6 +72,8 @@ class Memory:
     def query(self,addr):
         try:
             var = self.mem.get(addr)
+            if var == None:
+                raise InterpreterMemoryError(f"Addr [{addr}] not allocated")
             if isinstance(var , mem_Func):
                 return var
             value = var.value

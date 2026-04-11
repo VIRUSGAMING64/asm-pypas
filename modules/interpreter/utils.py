@@ -13,7 +13,6 @@ def ex_func(output, memory,start, lines):
     
     return fun,eofun
 
-
 def control(output, memory,start,lines):
     logging.log(logging.DEBUG,lines[start].expr)
     dx,code = extract(output, memory,start+1,lines)
@@ -26,6 +25,19 @@ def control(output, memory,start,lines):
     logging.log(logging.DEBUG,start, dx)
     return  cond,dx
 
+def loop(output, memory,start,lines):
+    logging.log(logging.DEBUG,lines[start].expr)
+    dx,code = extract(output, memory,start+1,lines)
+    Loop = None
+    try:
+        Loop = Token(
+            lines[start], LOOP, code, {"line": start}
+        )
+    except Exception as e:
+        output["Errors"].append(str(e))
+        
+    logging.log(logging.DEBUG,start, dx)
+    return  Loop,dx
 
 def extract(output,memory,start,lines):
     i = start
@@ -46,6 +58,16 @@ def extract(output,memory,start,lines):
                 structure.tokens.append(tk)
                 for tok in cond.code.tokens:
                     structure.tokens.append(tok)
+        elif line.tokens[0].expr == "while":
+            
+            Loop,dx = loop(output,memory,i,lines)
+            if Loop != None:
+                Loop.data["dx"] = dx-i
+                i = dx
+                structure.tokens.append(Loop)
+                for tok in cond.code.tokens:
+                    structure.tokens.append(tok)
+
         elif line.tokens[0].expr == "func":
             func,i = ex_func(output,memory,i,lines)
             try:
@@ -70,12 +92,3 @@ def extract(output,memory,start,lines):
         output["Errors"].append("Not closed structure")
     
     return i,structure 
-
-
-def GetType(p):
-    if isinstance(p, int):
-        return NUMBER
-    elif isinstance(p, str):
-        return STRING
-    elif isinstance(p, Token):
-        return p.type

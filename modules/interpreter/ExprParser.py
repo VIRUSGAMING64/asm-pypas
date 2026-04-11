@@ -1,5 +1,5 @@
 from modules.interpreter.Exceptions import *
-from modules.interpreter.t_statics import *
+from modules.interpreter.statics_values import *
 from modules.interpreter.Tokens import Token
 from modules.generic.utils import *
 import modules.interpreter.debug as debug
@@ -65,7 +65,6 @@ class ExprParser:
                 tokens.insert(i, func)
 
     def call(self, elem, args:list, mem:Memory):
-
         m_func = mem.query(elem.data["name"])
         if m_func.type != FUNC:
             raise InterpreterMemoryError(f"No function at addr [{m_func.name}]")
@@ -270,7 +269,12 @@ class Evaluator:
                 return self.find_label(line, line.tokens[1].expr),None
             except GotoException as e:
                 self.out["Errors"].append(e.GetError())
-        
+        elif line.type == LOOP:
+            try:
+                return self.eval_loop(line, mem)
+            except LoopException as e:
+                self.out["Errors"].append(e.GetError())
+                return INVALID, None
         elif line.tokens[0].expr == "ret":
             to_Eval = line.tokens[1:]
             value,err = ExprParser(mem,self.out).evalTokens(to_Eval)        
@@ -283,6 +287,9 @@ class Evaluator:
         
         return EMPTY,None
         
+    def eval_loop(line, mem):
+        pass #!TODO
+
     def run_line(self, line , mem):
         if line.type ==  FUNC:
             print("debug func: ", line.expr)
@@ -290,7 +297,7 @@ class Evaluator:
         #* ya que la funcion en si es un token que se intenta evaluar
         try:
             try: #* esto es asi porque primero se intentan usar las variables globales en la linea
-                ExprParser(self.memory,self.out).evalTokens(line)
+                ExprParser(self.memory,self.out).evalTokens(toks=line)
             except InterpreterMemoryError as e:
                 print("global error: ",e)
                 ExprParser(mem,self.out).evalTokens(line)
@@ -336,7 +343,6 @@ class Evaluator:
                 if isinstance(e, DeclarationException):
                     self.out["Errors"].append(e.GetError())
                 return INVALID,None
-            
             try:
                 value = value[0].expr
                 mem.alloc_var(line.tokens[1].data["name"],value,False, isglob = not self.isfunc)

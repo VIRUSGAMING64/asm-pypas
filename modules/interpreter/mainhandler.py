@@ -19,16 +19,15 @@ class MainHandler:
                 "Errors": ["code is invalid"],
                 "result": ""
             }
-
+        self.output = {
+            "Errors": [],
+            "result":""
+         }
         struct = None
         if isinstance(self.code,dict):
             struct = dict2Token(self.code)
 
         elif isinstance(self.code, str):
-            self.output = {
-                "Errors": [],
-                "result":""
-            }
             lines    = Lexer(self.code, self.output).TokenizeSource()
             s,struct = extract(self.output, self.mem, 0 , lines)
 

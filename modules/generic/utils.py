@@ -1,6 +1,6 @@
 import mimetypes
 import flask
-from ..interpreter.t_statics import *
+from ..interpreter.statics_values import *
 import functools
 import logging
 
