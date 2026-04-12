@@ -8,35 +8,33 @@ from .structures import *
 import logging
 from modules.interpreter.utils import *
 
-class MainHandler:
-    def __init__(self,code = "", memory = None):
-        self.code = code
-        self.mem = Memory() if memory is None else memory
+def ExecuteCode(code):
+    if not isinstance(code, str | dict):
+        return {
+            "Errors": ["code is invalid"],
+            "result": ""
+        }
+    
+    memory = Memory()
+    output = {
+        "Errors": [],
+        "result":""
+        }
+    struct = None
 
-    def run(self):
-        if not isinstance(self.code, str | dict):
-            return {
-                "Errors": ["code is invalid"],
-                "result": ""
-            }
-        self.output = {
-            "Errors": [],
-            "result":""
-         }
-        struct = None
-        if isinstance(self.code,dict):
-            struct = dict2Token(self.code)
+    if isinstance(code,dict):
+        struct = dict2Token(code)
 
-        elif isinstance(self.code, str):
-            lines    = Lexer(self.code, self.output).TokenizeSource()
-            s,struct = extract(self.output, self.mem, 0 , lines)
+    elif isinstance(code, str):
+        lines    = Lexer(code, output).TokenizeSource()
+        s,struct = extract(output, memory, 0 , lines)
 
-        if self.output["Errors"] == []:
-            for i in struct.tokens:
-                print("debug:",i.expr, i.data.get("name", None))  
-            res = Evaluator(struct, None, self.output, self.mem).run()
-            
-        logging.log(logging.DEBUG,self.mem.mem)
+    if output["Errors"] == []:
+        for i in struct.tokens:
+            print("debug:",i.expr, i.data.get("name", None))  
+        res = Evaluator(struct, None, output, memory).run()
+        
+    logging.log(logging.DEBUG,memory.mem)
 
 
-        return self.output
+    return output

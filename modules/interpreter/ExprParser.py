@@ -178,7 +178,7 @@ class ExprParser:
                 print(i.expr)
             raise ExpresionException(toks)
 
-        return nums,oper
+        return nums[0].expr
 
     def process(self, nums, oper):
         a = nums.pop()
@@ -193,7 +193,8 @@ class ExprParser:
         n = process_op(a, b, opp, self.memory)
         if n == None:
             #* se esta haciendo una asignacion de valor 
-            n = a
+            nums.append(b)
+            return
 
         nums.append(Token(n, GetType(n)))
 
@@ -277,10 +278,8 @@ class Evaluator:
                 return INVALID, None
         elif line.tokens[0].expr == "ret":
             to_Eval = line.tokens[1:]
-            value,err = ExprParser(mem,self.out).evalTokens(to_Eval)        
-            if len(err) > 0 or len(value) != 1:
-                raise InterpreterException("Return funcion value error")
-            return RETURNING,value[0].expr            
+            value = ExprParser(mem,self.out).evalTokens(to_Eval)        
+            return RETURNING,value   
         else:
             print("debug line: ",line.expr)
             return self.run_line(line, mem)
@@ -317,11 +316,9 @@ class Evaluator:
     
     def execute_condition(self, line, mem):       
         cond = line.data["condition"]
-        value,err = ExprParser(mem,self.out).evalTokens(cond)
-        if len(value) != 1 or len(err) != 0:
-            raise Exception("Invalid condition")
+        value = ExprParser(mem,self.out).evalTokens(cond)
         
-        if not value[0].expr:
+        if not value:
             newpos =self.pos + line.data["dx"]
             return self.jump(newpos),None 
         
@@ -337,14 +334,13 @@ class Evaluator:
                 if len(line.tokens) < 3 or line.tokens[1].type != VARIABLES or line.tokens[2].expr != "=":
                     raise DeclarationException(VARIABLES, line, [])
             
-                value,err = ExprParser( mem, self.out).evalTokens(line.tokens[3:])
+                value = ExprParser( mem, self.out).evalTokens(line.tokens[3:])
             
             except DeclarationException as e:
                 if isinstance(e, DeclarationException):
                     self.out["Errors"].append(e.GetError())
                 return INVALID,None
             try:
-                value = value[0].expr
                 mem.alloc_var(line.tokens[1].data["name"],value,False, isglob = not self.isfunc)
             except InterpreterMemoryError as e:
                 self.out["Errors"].append(e.GetError())

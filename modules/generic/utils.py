@@ -25,25 +25,8 @@ def is_operator(s):
 def is_unary(s):
     return True if s in ["+", "-", "!"] else False
 
-def add(a,b):
-    return a.expr + b.expr
-def sub(a,b):
-    return a.expr - b.expr
-def div(a,b):
-    return a.expr // b.expr
-def mul(a,b):
-    return a.expr * b.expr
 def _not(a):
     return not a.expr
-def _or(a,b):
-    return a.expr or b.expr
-def _xor(a,b):
-    return a.expr ^ b.expr
-def _and(a,b):
-    return a.expr and b.expr
-
-def eq(a, b):
-    return a.expr == b.expr
 
 def neg(a):
     return  -a.expr
@@ -51,23 +34,6 @@ def neg(a):
 def plus(a):
     return a.expr
 
-def ge(a, b):
-    return a.expr > b.expr
-
-def le(a, b):
-    return a.expr < b.expr
-
-def leq(a, b):
-    return a.expr <= b.expr
-
-def geq(a, b):
-    return a.expr >= b.expr
-
-def mod(a, b):
-    return a.expr % b.expr
-
-def neq(a,b):
-    return a.expr != b.expr
 
 una = {
     "-": neg,
@@ -83,22 +49,22 @@ def UnaryOP(a,op):
     return una[op.expr](a)
 
 operations = {
-    "+":add,
-    "-":sub,
-    "*":mul,
-    "/":div,
-    "!":_not,
-    "|":_or,
-    "^":_xor,
-    "&":_and,
-    "!=": neq,
-    "==": eq,
-    "<=": leq,
-    ">=": geq,
-    "<": le,
-    ">": ge,
+    "+":lambda a, b: a.expr + b.expr,
+    "-":lambda a, b: a.expr - b.expr,
+    "*":lambda a, b: a.expr * b.expr,
+    "/":lambda a, b: a.expr // b.expr,
+    "!":lambda a:  not a.expr,
+    "|":lambda a, b: a.expr | b.expr,
+    "^":lambda a, b: a.expr ^ b.expr,
+    "&":lambda a, b: a.expr & b.expr,
+    "!=": lambda a, b: a.expr != b.expr,
+    "==": lambda a, b: a.expr == b.expr,
+    "<=": lambda a, b: a.expr <= b.expr,
+    ">=": lambda a, b: a.expr >= b.expr,
+    "<": lambda a, b: a.expr < b.expr,
+    ">": lambda a, b: a.expr > b.expr,
     "=": asign,
-    "%": mod
+    "%": lambda a, b: a.expr % b.expr
 }
 
 def process_op(b,a,op, mem):

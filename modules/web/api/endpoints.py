@@ -21,9 +21,7 @@ def run():
             codes[name] = code
             saver.save(name, code.decode())
 
-        exe = interpreter.MainHandler(code.decode())
-        out = exe.run()
-        del exe
+        out = interpreter.ExecuteCode(code.decode())
         return out, 200
     
     except Exception as e:

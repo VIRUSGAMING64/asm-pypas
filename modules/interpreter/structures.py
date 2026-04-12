@@ -3,9 +3,9 @@ from .Lexer import *
 import modules.interpreter.debug as debug
 
 class IF: 
-    err = []
     def __init__(self,linenumer ,decl, code = None):
         self.code = None
+        err = []
 
         if len(decl.tokens) < 2:
             raise Exception(f"invalid declaration at line [{decl.get('line', 'unknow')}]")  
@@ -79,6 +79,3 @@ class FUNCS:
             FUNC,
           self.code.tokens
         )
-
-
-    
