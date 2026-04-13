@@ -15,10 +15,9 @@ class ExprParser:
         try:
             return self._evalTokens(toks)
         except Exception as e:
-            print("ERROR:",e)
             line = None if isinstance(toks, list) else toks.data["line"]
-            raise ArithmeticException(line, str(e))
-
+            return SimpreExceptionParser(e, self.out, line)
+            
     def funcat(self, i , tokens):
         opens = 1
         args = []
@@ -105,6 +104,8 @@ class ExprParser:
             newmem.mem[addr] = mem.mem[addr] #* Aqui lo que se hace es coger la referencia directa a las globales   
            
         code, ret = Evaluator(code, 0 , self.out, newmem, True).run()       
+        if ret == None:
+            ret = 0 #* defalut return value of function
         ret = Token(ret, GetType(ret))
         return ret 
 
@@ -202,10 +203,11 @@ class ExprParser:
 
 
 class Evaluator:
-    def __init__(self,structure:Token = None, start = None, output = None,memory = None, isfunc = False):
-        self.pos        = start if start is not None else 0
-        self.out        = {} if output is None else output
-        self.exceptions = []
+    def __init__(self,structure:Token = None, start = None, output = None,memory = None, isfunc = False, parent = None):
+        self.pos         = start if start is not None else 0
+        self.out         = {} if output is None else output
+        self.exceptions  = []
+        self.parent_node = parent 
         if isinstance(structure, Token):
             self.Tree   = structure
         else:
@@ -221,13 +223,15 @@ class Evaluator:
     def run(self):
         code, ret   = self.step()
         while code != RETURNING:
+            if code == FINDING:
+                return FINDING, ret
             if len(self.out['Errors']) >= 1:
+                break
+            if len(self.Tree.tokens) <= self.pos:
                 break
             li = self.Tree.tokens[self.pos].data.get("line", "UNKNOW")
             code, ret = self.step()
 
-            print("Excecuted line:", li)
-        
         #* esto es para debug solamente
         if debug.DEBUG:
             print("---" * 3, "memory audit", "---" * 3)
@@ -244,29 +248,30 @@ class Evaluator:
             if retcode != JUMPED:
                 self.pos += 1
             if self.pos >= len(self.Tree.tokens):
-                return RETURNING, 0 #! valor dafault para retorno de una funcion
+                return FINAL, 0 #! valor dafault para retorno de una funcion
             elif retcode == RETURNING:
                 return retcode,out
         except InterpreterMemoryError as e:
-            self.out["Errors"].append(e.GetError())
-            return INVALID,None
-        return EMPTY, out
+            return SimpreExceptionParser(e, self.out, -1)
+        return retcode, out
 
     def execute(self, line, mem):
         if line.tokens == None:
             print("debug none: ",line.expr)
             return EMPTY,None
-        
+    
         if len(line.tokens) == 0:
             print("debug zero: ",line.expr)
             return EMPTY,None
-        
+
+        if line.tokens[0] == "end":
+            return
+
         if line.type == CONDITION:
             return self.execute_condition(line, mem)
-        
         elif line.tokens[0].expr == 'var':
             try:
-                self.variable_declaration(line,mem=mem)
+                self.variable_declaration(line,mem)
             except DeclarationException as e:
                 self.out["Errors"].append(e.GetError())
         
@@ -275,15 +280,14 @@ class Evaluator:
         
         elif line.tokens[0].expr == "goto":
             try:
-                return self.find_label(line, line.tokens[1].expr),None
+                return self.find_label(line, line.tokens[1].expr)
             except GotoException as e:
                 self.out["Errors"].append(e.GetError())
         elif line.type == LOOP:
             try:
                 return self.eval_loop(line, mem)
             except LoopException as e:
-                self.out["Errors"].append(e.GetError())
-                return INVALID, None
+                return SimpreExceptionParser(e, self.out, line)
         elif line.tokens[0].expr == "ret":
             to_Eval = line.tokens[1:]
             value = ExprParser(mem,self.out).evalTokens(to_Eval)        
@@ -301,7 +305,7 @@ class Evaluator:
         if line.type ==  FUNC:
             print("debug func: ", line.expr)
             return EMPTY, None #* esto es para no evaluar las declaraciones de funciones 
-        #* ya que la funcion en si es un token que se intenta evaluar
+                               #* ya que la funcion en si es un token que se intenta evaluar
         try:
             try: #* esto es asi porque primero se intentan usar las variables globales en la linea
                 ExprParser(self.memory,self.out).evalTokens(toks=line)
@@ -309,8 +313,7 @@ class Evaluator:
                 print("global error: ",e)
                 ExprParser(mem,self.out).evalTokens(line)
         except InterpreterException as e:
-            self.out["Errors"].append(e.GetError())
-            return INVALID,None
+            return SimpreExceptionParser(e, self.out, line)
         return EMPTY, None
 
     def find_label(self,line , name):
@@ -320,19 +323,23 @@ class Evaluator:
             pos += 1
             if self.Tree.tokens[i].expr == name:
                 return self.jump(pos),None
-        raise GotoException(line)
-    
+        if self.parent_node == None:    
+            raise GotoException(line)
+        return FINDING, name
+
+
     def execute_condition(self, line, mem:Memory):       
         cond = line.data["condition"]
         value = ExprParser(mem,self.out).evalTokens(cond)
-        
         if not value:
-            newpos = self.pos + 1
-            return self.jump(newpos),None 
+            return EMPTY,None
         
         comem = mem.partialcopy()
-        return Evaluator(line.tokens, 0, self.out, comem, False).run()
-        
+        code, out = Evaluator(line.tokens, 0, self.out, comem, False, self.Tree).run()
+        if code == FINDING:
+            return self.find_label(line, out.removesuffix(":"))
+        return code, out
+
     def jump(self, pos):
         self.pos = pos
         return JUMPED
@@ -346,25 +353,20 @@ class Evaluator:
                 value = ExprParser( mem, self.out).evalTokens(line.tokens[3:])
             
             except DeclarationException as e:
-                if isinstance(e, DeclarationException):
-                    self.out["Errors"].append(e.GetError())
-                return INVALID,None
+                return SimpreExceptionParser(e, self.out, line)
+            
             try:
                 mem.alloc_var(line.tokens[1].data["name"],value,False, isglob = not self.isfunc)
             except InterpreterMemoryError as e:
-                self.out["Errors"].append(e.GetError())
-                return INVALID,None
+                return SimpreExceptionParser(e, self.out, line)
 
         except InterpreterException as e:
             if isinstance(e, ArithmeticException):
-                e.line = line
-                self.out["Errors"].append(e.GetError())
-                return INVALID,None
+                return SimpreExceptionParser(e, self.out, line)
             elif isinstance(e, InterpreterMemoryError):
-                e.line = line
-                self.out["Errors"].append(e.GetError())
-                return INVALID, None
+                return SimpreExceptionParser(e, self.out, line)
             
+
             self.out["Errors"].append(f"python exception at line [{line.data["line"]}]:[{str(e)}]")
         
         return VARIABLES,None

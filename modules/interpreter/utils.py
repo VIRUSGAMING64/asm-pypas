@@ -45,6 +45,7 @@ def extract(output,memory,start,lines):
     
     while i < len(lines):
         line = lines[i]
+
         if len(line.tokens) == 0:
             logging.log(logging.DEBUG,line.tokens, line.expr)
             i+=1

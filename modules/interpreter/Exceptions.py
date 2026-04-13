@@ -1,5 +1,11 @@
 
 import logging
+from .statics_values import *
+
+def SimpreExceptionParser(e, out, line):
+    e.line = line
+    out["Errors"].append(e.GetError())
+    return INVALID, None
 
 class InterpreterException(Exception):
     def __init__(self, line, *args):
