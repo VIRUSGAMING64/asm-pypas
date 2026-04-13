@@ -127,8 +127,6 @@ class Lexer:
             return Token("", LINE, data = {"line": p})
         
         t_line = self.str2Token(line)
-        print("debugeando: ",t_line.expr, t_line.data["name"])
-        
         for j in range(len(t_line.tokens)):
             if t_line.tokens[j].expr == "//":
                 t_line.tokens[j].type = COMMENT

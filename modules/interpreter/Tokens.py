@@ -4,14 +4,14 @@ import functools
 
 class Token:
     def __init__(self,expr, type = NIL, tokens = None, data = None):
-        self.expr:str = expr
-        self.type = type
-        self.tokens  = [] if tokens is None else tokens
-        self.data = {} if data is None else dict(data)
+        self.expr:str     = expr
+        self.type         = type
+        self.tokens       = [] if tokens is None else tokens
+        self.data         = {} if data is None else dict(data)
         self.data["name"] = self.expr
 
     def __dict__(self):
-        di = {}
+        di         = {}
         di["expr"] = self.expr
         di["data"] = self.data
         di["type"] = self.type

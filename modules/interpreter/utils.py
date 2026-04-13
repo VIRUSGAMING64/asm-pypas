@@ -31,7 +31,7 @@ def loop(output, memory,start,lines):
     Loop = None
     try:
         Loop = Token(
-            lines[start], LOOP, code, {"line": start}
+            lines[start], LOOP, code.tokens, {"line": start, "condition": lines[start].tokens[1:]}
         )
     except Exception as e:
         output["Errors"].append(str(e))
@@ -57,8 +57,6 @@ def extract(output,memory,start,lines):
                 tk.data["dx"] = dx-i
                 i = dx
                 structure.tokens.append(tk)
-                #for tok in cond.code.tokens:
-                #    structure.tokens.append(tok)
         elif line.tokens[0].expr == "while":
             
             Loop,dx = loop(output,memory,i,lines)
@@ -66,10 +64,7 @@ def extract(output,memory,start,lines):
                 Loop.data["dx"] = dx-i
                 i = dx
                 structure.tokens.append(Loop)
-                
-                for tok in cond.code.tokens:
-                    structure.tokens.append(tok)
-
+            
         elif line.tokens[0].expr == "func":
             func,i = ex_func(output,memory,i,lines)
             try:
@@ -91,6 +86,6 @@ def extract(output,memory,start,lines):
         i += 1 
 
     if start != 0:
-        output["Errors"].append("Not closed structure")
+        output["Errors"].append(f"Not closed structure at line [{start}]")
     
     return i,structure 

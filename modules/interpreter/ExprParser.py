@@ -118,8 +118,6 @@ class ExprParser:
         unary   = True 
 
         self.extract_funcs_call(toks)
-        for to in toks.tokens:
-            print(to.expr)
 
         for i in range(len(toks.tokens)):
             if toks.tokens[i].type == FUNCCALL:
@@ -127,11 +125,7 @@ class ExprParser:
                 for arg in toks.tokens[i].data["args"]:
                     if arg == []:
                         continue
-                    out = self.evalTokens(arg)
-                    if len(out[0]) != 1 or len(out[1]) != 0:
-                        print("here ?")
-                        raise InterpreterException(toks) 
-                    arg = out[0][0].expr
+                    arg = self.evalTokens(arg)
                     args.append(arg)
                 toks.tokens[i] = self.call(toks.tokens[i], args, self.memory)
 
@@ -212,9 +206,7 @@ class Evaluator:
             self.Tree   = structure
         else:
             self.Tree = Token("__source__", NIL, structure.copy())
-        
-        debug.dst(self.Tree)
-
+    
         self.memory     = memory
         self.isfunc     = isfunc
         if self.Tree is None:
@@ -231,13 +223,8 @@ class Evaluator:
                 break
             li = self.Tree.tokens[self.pos].data.get("line", "UNKNOW")
             code, ret = self.step()
-
-        #* esto es para debug solamente
-        if debug.DEBUG:
-            print("---" * 3, "memory audit", "---" * 3)
-            audit = debug.audit_memory(self.memory)
-            print(audit)
-            self.out["result"] = audit
+        if self.parent_node == None:
+            self.out["result"] = debug.audit_memory(self.memory)
         return code, ret
 
     def step(self):
@@ -257,11 +244,9 @@ class Evaluator:
 
     def execute(self, line, mem):
         if line.tokens == None:
-            print("debug none: ",line.expr)
             return EMPTY,None
     
         if len(line.tokens) == 0:
-            print("debug zero: ",line.expr)
             return EMPTY,None
 
         if line.tokens[0] == "end":
@@ -292,18 +277,26 @@ class Evaluator:
             to_Eval = line.tokens[1:]
             value = ExprParser(mem,self.out).evalTokens(to_Eval)        
             return RETURNING,value   
-        else:
-            print("debug line: ",line.expr)
+        else:   
             return self.run_line(line, mem)
         
         return EMPTY,None
         
-    def eval_loop(line, mem):
-        pass #!TODO
+    def eval_loop(self, line, mem:Memory):
+        
+        cond = line.data["condition"]
+
+        ev = ExprParser(mem, self.out, mem)
+        while ev.evalTokens(cond):
+            eva = Evaluator(line.tokens, 0, self.out, mem.partialcopy(), False, self.Tree)
+            code, ret = eva.run()
+            if code == FINDING:
+                return self.find_label(line, ret)
+
+        return EMPTY, None
 
     def run_line(self, line , mem):
         if line.type ==  FUNC:
-            print("debug func: ", line.expr)
             return EMPTY, None #* esto es para no evaluar las declaraciones de funciones 
                                #* ya que la funcion en si es un token que se intenta evaluar
         try:
@@ -316,8 +309,9 @@ class Evaluator:
             return SimpreExceptionParser(e, self.out, line)
         return EMPTY, None
 
-    def find_label(self,line , name):
-        name += ":"
+    def find_label(self,line , name:str):
+        if not name.endswith(":"):
+            name += ":"
         pos = -1
         for i in range(len(self.Tree.tokens)):
             pos += 1
