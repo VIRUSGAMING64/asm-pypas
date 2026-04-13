@@ -210,6 +210,9 @@ class Evaluator:
             self.Tree   = structure
         else:
             self.Tree = Token("__source__", NIL, structure.copy())
+        
+        debug.dst(self.Tree)
+
         self.memory     = memory
         self.isfunc     = isfunc
         if self.Tree is None:
