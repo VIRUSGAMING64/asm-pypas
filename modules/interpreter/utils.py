@@ -56,8 +56,8 @@ def extract(output,memory,start,lines):
                 tk.data["dx"] = dx-i
                 i = dx
                 structure.tokens.append(tk)
-                for tok in cond.code.tokens:
-                    structure.tokens.append(tok)
+                #for tok in cond.code.tokens:
+                #    structure.tokens.append(tok)
         elif line.tokens[0].expr == "while":
             
             Loop,dx = loop(output,memory,i,lines)
@@ -65,6 +65,7 @@ def extract(output,memory,start,lines):
                 Loop.data["dx"] = dx-i
                 i = dx
                 structure.tokens.append(Loop)
+                
                 for tok in cond.code.tokens:
                     structure.tokens.append(tok)
 

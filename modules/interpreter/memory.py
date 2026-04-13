@@ -55,7 +55,7 @@ class Memory:
             newmem[addr] = self.mem[addr] 
             #*aqui solo se hace una referencia las que ya existen
             #*las nuevas que se creen no modifican la anterior memoria
-        return Memory(newmem, 0 , True)
+        return Memory(newmem, -1 , True)
 
     def copy(self):
         return Memory(self.mem.copy(), self.max_alloc, skip_builtins=True)

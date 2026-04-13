@@ -104,7 +104,7 @@ class ExprParser:
                 continue
             newmem.mem[addr] = mem.mem[addr] #* Aqui lo que se hace es coger la referencia directa a las globales   
            
-        ret = Evaluator(code, 0 , self.out, newmem, True).run()       
+        code, ret = Evaluator(code, 0 , self.out, newmem, True).run()       
         ret = Token(ret, GetType(ret))
         return ret 
 
@@ -172,12 +172,14 @@ class ExprParser:
         while len(oper):
             self.process(nums,oper)
 
-
-        if len(nums) != 1:
+        if len(nums) > 1 or len(oper)!=0:
             for i in nums:
                 print(i.expr)
             raise ExpresionException(toks)
-
+        
+        if len(nums) == 0:
+            return 0
+        
         return nums[0].expr
 
     def process(self, nums, oper):
@@ -204,7 +206,10 @@ class Evaluator:
         self.pos        = start if start is not None else 0
         self.out        = {} if output is None else output
         self.exceptions = []
-        self.Tree       = structure
+        if isinstance(structure, Token):
+            self.Tree   = structure
+        else:
+            self.Tree = Token("__source__", NIL, structure.copy())
         self.memory     = memory
         self.isfunc     = isfunc
         if self.Tree is None:
@@ -226,7 +231,7 @@ class Evaluator:
             audit = debug.audit_memory(self.memory)
             print(audit)
             self.out["result"] = audit
-        return ret
+        return code, ret
 
     def step(self):
         try:
@@ -254,7 +259,7 @@ class Evaluator:
             return EMPTY,None
         
         if line.type == CONDITION:
-            return self.execute_condition(line, mem.copy())
+            return self.execute_condition(line, mem)
         
         elif line.tokens[0].expr == 'var':
             try:
@@ -314,16 +319,17 @@ class Evaluator:
                 return self.jump(pos),None
         raise GotoException(line)
     
-    def execute_condition(self, line, mem):       
+    def execute_condition(self, line, mem:Memory):       
         cond = line.data["condition"]
         value = ExprParser(mem,self.out).evalTokens(cond)
         
         if not value:
-            newpos =self.pos + line.data["dx"]
+            newpos = self.pos + 1
             return self.jump(newpos),None 
         
-        return EMPTY, None
-
+        comem = mem.partialcopy()
+        return Evaluator(line.tokens, 0, self.out, comem, False).run()
+        
     def jump(self, pos):
         self.pos = pos
         return JUMPED

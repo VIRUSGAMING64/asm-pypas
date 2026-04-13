@@ -32,7 +32,7 @@ def ExecuteCode(code):
     if output["Errors"] == []:
         for i in struct.tokens:
             print("debug:",i.expr, i.data.get("name", None))  
-        res = Evaluator(struct, None, output, memory).run()
+        code, res = Evaluator(struct, None, output, memory).run()
         
     logging.log(logging.DEBUG,memory.mem)
 
