@@ -23,6 +23,14 @@ class InterpreterException(Exception):
             return self.line
         self.line = self.line.data.get("line", None)
         return self.line
+
+class BuiltinException(InterpreterException):
+    def __init__(self, base, line=None, *args):
+        super().__init__(line, *args)
+        self.base = base
+
+    def GetError(self):
+        return str(self.base) + f" at line [{self.GetLine()}]"
     
 class InvalidTokenException(InterpreterException):
     def __init__(self, token , line, *args):

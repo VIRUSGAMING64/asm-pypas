@@ -43,7 +43,7 @@ class ExprParser:
                 args.append(arg)
                 return j,args
         
-        raise Exception("Not closed function call !!")
+        raise CallFuncException(i, "Not closed function call !!")
 
     def extract_funcs_call(self,toks):
         tokens:list = toks.tokens
@@ -76,7 +76,10 @@ class ExprParser:
 
         if code == BUILTIN:
             name = m_func.name
-            ret = in_builtin.__builtins_calls__[name](*args)
+            try:
+                ret = in_builtin.__builtins_calls__[name](*args)
+            except Exception as e:
+                raise BuiltinException(e)
             if ret == None:
                 ret = 0
             return Token(ret, GetType(ret))
@@ -127,8 +130,12 @@ class ExprParser:
                         continue
                     arg = self.evalTokens(arg)
                     args.append(arg)
-                toks.tokens[i] = self.call(toks.tokens[i], args, self.memory)
-
+                try:
+                    toks.tokens[i] = self.call(toks.tokens[i], args, self.memory)
+                except TypeError as e:
+                    self.out["Errors"].append(f"Invalid argument type at line {toks.data.get("line", "unknow")}")
+                    return 0
+                
         for elem in toks.tokens:
             if elem.type == COMMENT:
                 continue
@@ -141,6 +148,8 @@ class ExprParser:
                 unary = True
             
             elif elem.expr == ")":
+                if len(oper) == 0:
+                    raise ExpresionException(toks)
                 while oper[-1].expr != "(":
                     self.process(nums, oper)
                 
@@ -178,23 +187,24 @@ class ExprParser:
         return nums[0].expr
 
     def process(self, nums, oper):
-        a = nums.pop()
-        opp = oper.pop()
-        if opp.data.get("neg", False):
-            res = UnaryOP(a,  opp)
-            nums.append(
-                Token( res, GetType(res))
-            )
-            return
-        b = nums.pop()        
-        n = process_op(a, b, opp, self.memory)
-        if n == None:
-            #* se esta haciendo una asignacion de valor 
-            nums.append(b)
-            return
-
-        nums.append(Token(n, GetType(n)))
-
+        try:
+            a = nums.pop()
+            opp = oper.pop()
+            if opp.data.get("neg", False):
+                res = UnaryOP(a,  opp)
+                nums.append(
+                    Token( res, GetType(res))
+                )
+                return
+            b = nums.pop()        
+            n = process_op(a, b, opp, self.memory)
+            if n == None:
+                #* se esta haciendo una asignacion de valor 
+                nums.append(b)
+                return
+            nums.append(Token(n, GetType(n)))
+        except Exception as e:
+            raise ExpresionException(None)
 
 class Evaluator:
     def __init__(self,structure:Token = None, start = None, output = None,memory = None, isfunc = False, parent = None):
