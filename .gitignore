@@ -21,3 +21,5 @@ informes/
 .github/
 .pytest_cache/
 venv/
+interpreter_extreme_tests.py
+rb.cpp

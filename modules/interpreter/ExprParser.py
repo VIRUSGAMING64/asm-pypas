@@ -6,10 +6,9 @@ import modules.interpreter.debug as debug
 from modules.interpreter.memory import *
 
 class ExprParser:
-    def __init__(self, memory:Memory, out, globmem = None):
+    def __init__(self, memory:Memory, out):
         self.memory     = memory
         self.out        = out
-        self.globmem    = globmem
 
     def evalTokens(self, toks):
         try:
@@ -45,19 +44,21 @@ class ExprParser:
         
         raise CallFuncException(i, "Not closed function call !!")
 
-    def extract_funcs_call(self,toks):
+    def extract_funcs_call(self,toks, mem:Memory):
         tokens:list = toks.tokens
         for i in range(len(tokens)):
             if i + 1 >= len(tokens):
                 break
-            
             if tokens[i].type == VARIABLES and tokens[i + 1].expr == "(":
+                name = tokens[i].data["name"]
+                fu = mem.query(name)
+                if not isinstance(fu, mem_Func):
+                    raise CallFuncException(-1,"Error calling non function")
+                
                 eofc,args = self.funcat(i,tokens)
-                if eofc == None:
-                    raise Exception("Func call not closed")
                 func = Token("__func__", FUNCCALL, []) 
                 func.data["args"] = []
-                func.data["name"] = tokens[i].expr
+                func.data["name"] = name
                 for arg in args:
                     func.data["args"].append(arg)
                 del tokens[i : eofc + 1]
@@ -118,9 +119,8 @@ class ExprParser:
             toks = Token(None, LINE , toks)
         nums    = []
         oper    = []
-        unary   = True 
-
-        self.extract_funcs_call(toks)
+        unary   = True
+        self.extract_funcs_call(toks, self.memory)
 
         for i in range(len(toks.tokens)):
             if toks.tokens[i].type == FUNCCALL:
@@ -231,8 +231,8 @@ class Evaluator:
                 break
             if len(self.Tree.tokens) <= self.pos:
                 break
-            li = self.Tree.tokens[self.pos].data.get("line", "UNKNOW")
             code, ret = self.step()
+            print("executed line:", self.pos)
         if self.parent_node == None:
             self.out["result"] = debug.audit_memory(self.memory)
         return code, ret
@@ -253,9 +253,6 @@ class Evaluator:
         return retcode, out
 
     def execute(self, line, mem):
-        if line.tokens == None:
-            return EMPTY,None
-    
         if len(line.tokens) == 0:
             return EMPTY,None
 
@@ -275,7 +272,12 @@ class Evaluator:
         
         elif line.tokens[0].expr == "goto":
             try:
-                return self.find_label(line, line.tokens[1].expr)
+                try:
+                    lab = line.tokens[1].expr
+                except IndexError as e:
+                    self.out["Errors"].append("Missing goto label")
+                    return INVALID, None
+                return self.find_label(line, lab)
             except GotoException as e:
                 self.out["Errors"].append(e.GetError())
         elif line.type == LOOP:
@@ -296,7 +298,7 @@ class Evaluator:
         
         cond = line.data["condition"]
 
-        ev = ExprParser(mem, self.out, mem)
+        ev = ExprParser(mem, self.out)
         while ev.evalTokens(cond):
             eva = Evaluator(line.tokens, 0, self.out, mem.partialcopy(), False, self.Tree)
             code, ret = eva.run()

@@ -30,9 +30,18 @@ def loop(output, memory,start,lines):
     dx,code = extract(output, memory,start+1,lines)
     Loop = None
     try:
+        cond = None
+        try:
+            cond = lines[start].tokens[1:]
+            if len(cond) == 0:
+                raise Exception("Invalid condtion")
+        except Exception as e:
+            output["Errors"].append(f"Invalid loop condition at line [{start}]")
+
         Loop = Token(
-            lines[start], LOOP, code.tokens, {"line": start, "condition": lines[start].tokens[1:]}
+            lines[start], LOOP, code.tokens, {"line": start, "condition": cond}
         )
+
     except Exception as e:
         output["Errors"].append(str(e))
         

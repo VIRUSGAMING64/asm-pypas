@@ -61,7 +61,12 @@ class Memory:
         return Memory(self.mem.copy(), self.max_alloc, skip_builtins=True)
 
     def alloc_var(self, addr,value, overwrite = False, isglob = True):
+        
+        
         val = self.mem.get(addr,None)
+
+        if addr in ["True", "False"]:
+            raise InterpreterMemoryError(f"Reserved addr [{addr}]")
 
         if not overwrite and val != None:
             raise InterpreterMemoryError(f"Overwrite addr [{addr}]")
@@ -78,6 +83,10 @@ class Memory:
         self.mem[addr].value=value
 
     def query(self,addr):
+
+        if addr in ["True", "False"]:
+            return 1 if addr == "True" else 0
+
         try:
             var = self.mem.get(addr)
             if var == None:

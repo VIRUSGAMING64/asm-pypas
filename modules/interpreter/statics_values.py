@@ -71,13 +71,9 @@ keywords = [
     "else",
     "while",
     "func",
-    "True",
     "var",
-    "False",
     "for",
     "end",
-    "push",
-    "pop",
     "ret"
 ]
 
