@@ -59,7 +59,7 @@ def sendCode():
     if isinstance(cod, bytes):
         cod = cod.decode()
     else:
-        return {"status":"fail"},200
+        return {"status":"fail"},400
     
     return {"status":"ok","code":cod},200
 

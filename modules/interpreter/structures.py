@@ -62,7 +62,7 @@ class FUNCS:
                 if comma.expr != ',':       
                     raise DeclarationException(FUNC, self.i)
                 
-            except Exception as e:
+            except DeclarationException as e:
                 raise e
 
         self.novars = novars
@@ -70,7 +70,7 @@ class FUNCS:
 
         print(novars,set(novars))
         if len(novars) != len(set(novars)):
-            raise Exception(f"Invalid function declaration at line [{self.i}]")
+            raise DeclarationException(FUNC, self.i)
 
 
     def Token(self):

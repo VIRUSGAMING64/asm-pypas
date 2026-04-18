@@ -105,6 +105,8 @@ class ExprParser:
         for addr in mem.mem:
             if mem.mem[addr].isglob == False:
                 continue
+            if newmem.mem.get(addr) != None:
+                continue 
             newmem.mem[addr] = mem.mem[addr] #* Aqui lo que se hace es coger la referencia directa a las globales   
            
         code, ret = Evaluator(code, 0 , self.out, newmem, True).run()       

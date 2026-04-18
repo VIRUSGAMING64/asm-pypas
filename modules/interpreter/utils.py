@@ -8,9 +8,9 @@ def ex_func(output, memory,start, lines):
         fun = FUNCS(start,lines)
         fun.code = code
     except Exception as e:
-        output["Errors"].append(str(e))
-        logging.log(logging.DEBUG,e)
-    
+
+        return SimpreExceptionParser(e, output, start)
+        
     return fun,eofun
 
 def control(output, memory,start,lines):
@@ -76,6 +76,8 @@ def extract(output,memory,start,lines):
             
         elif line.tokens[0].expr == "func":
             func,i = ex_func(output,memory,i,lines)
+            if len(output["Errors"]) > 0:
+                return i, structure
             try:
                 if func != None:
                     memory.alloc_func(func.name, func.novars, func.code)

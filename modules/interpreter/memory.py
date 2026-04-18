@@ -2,7 +2,6 @@ from modules.interpreter.Exceptions import *
 from modules.interpreter.statics_values import *
 import modules.interpreter.builtin as in_builtin
 
-
 class mem_Var:
     def __init__(self, name, value, isglob):
         self.name  = name
@@ -24,7 +23,6 @@ class mem_Func:
 
     def copy(self):
         return mem_Func(self.name, self.args.copy(), self.code.copy())
-
 
 
 class Memory:
