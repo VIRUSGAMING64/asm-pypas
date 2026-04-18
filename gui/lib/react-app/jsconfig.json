@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        "ignoreDeprecations": "6.0",
+        "baseUrl": "./src/",
+        "paths": {
+            "tailwind": [
+                "./libs/tailwind.js"
+            ],
+            "material-icons": [
+                "./libs/material-icons-main/iconfont/material-icons.css"
+            ],
+            "codemirrormin": [
+                "./libs/codemirror/codemirror.min.js"
+            ] ,
+            "codemirrorcss": [
+                "./libs/codemirror/codemirror.min.css"
+            ]  ,
+            "codemirrormingo": [
+                "./libs/codemirror/go.min.js"
+            ] ,
+            "codemirrordracula": [
+                "./libs/codemirror/dracula.min.css"
+            ] ,
+            "materialicon": [
+                "./libs/iconfont/material-icons.css"
+            ]
+        }
+    }
+}

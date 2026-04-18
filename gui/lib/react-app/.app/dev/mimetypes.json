@@ -1,0 +1,11 @@
+{
+    ".js": "application/javascript",
+    ".jsx": "application/javascript",
+    ".html": "text/html",
+    ".css": "text/css",
+    ".svg":"image/svg+xml",
+    ".ttf":"font/ttf",
+    ".otf":"font/otf",
+    ".woff":"font/woff",
+    ".woff2":"font/woff2"
+}

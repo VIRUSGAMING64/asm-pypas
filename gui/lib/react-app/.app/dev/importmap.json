@@ -1,0 +1,5 @@
+{
+    "react": "/_server/src/react.js",
+    "react-dom": "/_server/src/react-dom.js",
+    "next/":"./components/"
+}

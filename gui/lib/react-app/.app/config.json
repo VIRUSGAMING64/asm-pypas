@@ -1,0 +1,14 @@
+{
+    "PORT": 8000,
+    "SERVER_PATH": ".app/",
+    "APP_PATH": "./",
+    "PAGE_NAME": "../../app/",
+    "PAGES_DIR": "../../app/",
+    "LAYOUT_NAME": "layout.jsx",
+    "SERVER_URL": "/_server/",
+    "SOURCES_PATH": "../../src/",
+    "PUBLIC_PATH": "public/",
+    "SOURCES_URL": "src/",
+    "PUBLIC_URL": "public/",
+    "RAW_SOURCES": "rawsrc/"
+}

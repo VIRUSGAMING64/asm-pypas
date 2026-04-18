@@ -15,16 +15,18 @@ for name in os.listdir(CODES_DIR):
 
 @app.route("/")
 def main():
-    return response(ROOT+"/html/index.html")
+    return response(ROOT+"/index.html")
 
 @app.route("/api")
 def api():
-    return response(ROOT + "/html/api.html")
+    return response(ROOT + "/api.html")
 
 
-@app.route('/gui/<path:subpath>')
+@app.route('/<path:subpath>')
 def show_subpath(subpath):
-
+    if(not "." in subpath):
+        subpath = subpath + ".html"
+        
     try:
         safe_path = CodeSaver(ROOT).resolve_path(subpath) 
     except Exception as e:

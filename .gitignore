@@ -23,3 +23,5 @@ informes/
 venv/
 interpreter_extreme_tests.py
 rb.cpp
+old_html
+old_gui
