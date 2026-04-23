@@ -26,3 +26,13 @@ rb.cpp
 old_html
 old_gui
 guic/
+node_modules/
+build/
+dist/
+*.egg-info/
+*.egg
+*.log
+*.aux
+*.tex
+*.out
+*.pdf
