@@ -13,7 +13,6 @@ docs
 .venv
 .vscode
 .todo
-.clean
 .gitignore
 out.txt
 tests/
@@ -27,8 +26,10 @@ old_html
 old_gui
 guic/
 node_modules/
+node_modules/*
 build/
 dist/
+node_modules/**
 *.egg-info/
 *.egg
 *.log
