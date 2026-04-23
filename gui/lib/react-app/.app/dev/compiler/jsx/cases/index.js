@@ -7,5 +7,5 @@ const cases = {
 
 module.exports = ($, url, type, currentUrl) => {
     //console.log(url,currentUrl);
-    return cases[type] ? cases[type]($, url, currentUrl) : `${$} "${url}"`;
+    return cases[type] ? cases[type]($, url, currentUrl) : `${$} "${path.join(currentUrl, (url))}"`;
 };
