@@ -177,7 +177,6 @@ La IA se utilizó como apoyo. En concreto, se empleó para:
 - ayudar con el tailwind de algunos elementos frontend
 - ayudar a generar dockerfile
 - algunas sugerencias de código (Algunas reflejadas en el nombre de commits).
-- correcion de errores menores en el código (validacion de nombres en los endpoints).
 
 ## ⚠️ Limitaciones actuales
 
