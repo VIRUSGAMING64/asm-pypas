@@ -1,101 +1,55 @@
 # ASM-PyPas 🚀
 
-ASM-PyPas es un intérprete experimental con interfaz web. Combina un backend en Flask, un motor de interpretación en Python y un editor web para crear, guardar y ejecutar código.
+ASM-PyPas es un intérprete experimental con backend en Python y una interfaz web para crear, guardar y ejecutar código desde el navegador.
 
 ## ✨ Resumen
 
-- 🌐 Backend HTTP con Flask para UI y API.
-- 🧠 Motor de interpretación con tokenización, parser y ejecución básica.
-- 📝 Editor web con CodeMirror para administrar archivos en `codes/`.
+- 🌐 Servidor HTTP en Flask.
+- 🧠 Intérprete propio (tokenización, parser y ejecución).
+- 📝 Gestión de archivos de código en `codes/`.
+- 🔌 API para ejecutar, guardar, listar y borrar archivos.
 
-## ✅ Estado Actual
+## 🆕 Novedades incluidas en este README
+
+- ✅ Estructura del repositorio actualizada a lo que existe hoy.
+- ✅ Se añadieron `guic/`, `docs/` y scripts recientes.
+- ✅ Se incluyó `scripts/interpreter_extreme_tests.py` como validador de estrés.
+- ✅ Se eliminaron referencias detalladas a librerías de JavaScript.
+
+## ✅ Estado actual
 
 Actualmente el proyecto permite:
 
-- 📁 Crear, abrir y eliminar archivos desde la interfaz.
-- 🔄 Cargar los archivos existentes al abrir la aplicación.
-- 💾 Guardar cambios automáticamente.
-- ▶️ Ejecutar código vía API y mostrar salida o errores.
+- 📁 Crear, abrir y eliminar archivos de código.
+- 💾 Guardar cambios.
+- ▶️ Ejecutar código vía API y devolver resultado/errores.
+- 🔒 Validar nombres de archivo para evitar accesos inseguros.
 
 ## 🏗️ Arquitectura
 
-- ⚙️ `main.py`: punto de entrada del servidor.
-- 🧩 `modules/interpreter`: tokens, parser, estructuras y ejecución.
-- 🔌 `modules/web`: rutas web, API y utilidades compartidas.
-- 🛠️ `modules/generic`: helpers comunes.
-- 🖥️ `gui`: frontend estático y documentación de API.
-- 📂 `codes`: almacenamiento de archivos editables.
-- 🧪 `scripts`: utilidades auxiliares para limpieza y arranque.
+- ⚙️ `main.py`: arranque del servidor en puerto `8000`.
+- 🧩 `modules/interpreter/`: núcleo del intérprete.
+- 🔌 `modules/web/`: rutas, API y utilidades web.
+- 🛠️ `modules/generic/`: helpers compartidos.
+- 🖥️ `gui/`: fuentes de la interfaz.
+- 📦 `guic/`: salida generada para servir en runtime.
+- 📂 `codes/`: archivos editables por el usuario.
+- 🧪 `scripts/`: ejecución, build y utilidades.
 
 ## 🌳 Estructura del repositorio
 
 ```text
 asm-pypas/
-├── 📄 Dockerfile
 ├── 📄 README.md
-├── 📄 main.py
+├── 📄 Dockerfile
 ├── 📄 requirements.txt
+├── 📄 main.py
+├── 📄 build.js
 ├── 📁 gui/
+│   ├── 📄 index.html
+│   ├── 📄 index.jsx
 │   ├── 📁 app/
-│   │   └── 📄 index.jsx
-│   ├── 📁 guihtml/
-│   │   ├── 📄 index.html
-│   │   └── 📁 _server/
-│   │       ├── 📁 sites/
-│   │       │   └── 📄 index.js
-│   │       └── 📁 src/
-│   │           ├── 📄 main.css
-│   │           ├── 📄 react-dom.js
-│   │           ├── 📄 react.js
-│   │           ├── 📄 styles.css
-│   │           └── 📁 libs/
-│   │               ├── 📄 tailwind.js
-│   │               ├── 📁 codemirror/
-│   │               └── 📁 iconfont/
-│   ├── 📁 lib/
-│   │   └── 📁 react-app/
-│   │       ├── 📄 jsconfig.json
-│   │       ├── 📄 layout.jsx
-│   │       └── 📄 package.json
-│   └── 📁 src/
-│       ├── 📄 main.css
-│       ├── 📄 styles.css
-│       └── 📁 libs/
-│           ├── 📄 tailwind.js
-│           ├── 📁 codemirror/
-│           │   ├── 📄 codemirror.min.css
-│           │   ├── 📄 codemirror.min.js
-│           │   ├── 📄 dracula.min.css
-│           │   ├── 📄 go.min.js
-│           │   └── 📄 python.min.js
-│           ├── 📁 iconfont/
-│           │   ├── 📄 _mixins.scss
-│           │   ├── 📄 _variables.scss
-│           │   ├── 📄 filled.css
-│           │   ├── 📄 filled.scss
-│           │   ├── 📄 material-icons.css
-│           │   ├── 📄 material-icons.scss
-│           │   ├── 📄 outlined.css
-│           │   ├── 📄 outlined.scss
-│           │   ├── 📄 round.css
-│           │   ├── 📄 round.scss
-│           │   ├── 📄 sharp.css
-│           │   ├── 📄 sharp.scss
-│           │   ├── 📄 two-tone.css
-│           │   └── 📄 two-tone.scss
-│           └── 📁 material-icons-main/
-│               ├── 📄 _config.yml
-│               ├── 📄 demo.html
-│               ├── 📄 index.d.ts
-│               ├── 📄 LICENSE
-│               ├── 📄 package.json
-│               ├── 📄 README.md
-│               ├── 📁 _data/
-│               │   ├── 📄 codepoints.json
-│               │   └── 📄 versions.json
-│               ├── 📁 css/ (estilos compilados)
-│               ├── 📁 iconfont/ (fuentes de iconos)
-│               └── 📁 scripts/ (herramientas de build)
+│   └── 📁 react/
 ├── 📁 modules/
 │   ├── 📄 __init__.py
 │   ├── 📁 generic/
@@ -123,25 +77,25 @@ asm-pypas/
 │           ├── 📄 errors.py
 │           ├── 📄 saver.py
 │           └── 📄 utils.py
-└── 📁 scripts/
-    ├── 📄 buildpage.sh
-    ├── 📄 clean
-    ├── 📄 clean.cpp
-    ├── 📄 run.sh
-    └── 📄 runsample.sh
+├── 📁 scripts/
+│   ├── 📄 buildpage.sh
+│   ├── 📄 run.sh
+│   ├── 📄 runsample.sh
+│   ├── 📄 clean.cpp
+│   └── 📄 clean
 ```
 
 ## 📋 Requisitos
 
-- 🐍 Python 3.10 o superior.
+- 🐍 Python 3.10+.
 - 📦 pip.
-- ✅ Dependencia actual: Flask.
+- ✅ Dependencia backend actual (`requirements.txt`): Flask.
 
 ## 🛠️ Instalación
 
 ```bash
-git clone https://github.com/VIRUSGAMING64/Interpreter.git
-cd Interpreter
+git clone https://github.com/VIRUSGAMING64/asm-pypas.git
+cd asm-pypas
 
 python3 -m venv .venv
 source .venv/bin/activate
@@ -150,13 +104,13 @@ pip install -r requirements.txt
 
 ## ▶️ Ejecución
 
-Opción 1, directa:
+Opción directa:
 
 ```bash
 python3 main.py
 ```
 
-Opción 2, con script:
+Opción con script:
 
 ```bash
 bash scripts/run.sh
@@ -169,54 +123,54 @@ Servidor:
 
 ## 🔄 Flujo de uso
 
-1. Abre la aplicación en el navegador.
+1. Abre la app en el navegador.
 2. Crea o selecciona un archivo.
-3. Escribe código en el editor.
-4. El contenido se guarda automáticamente.
-5. Ejecuta con el botón Play para ver salida y errores.
+3. Edita el contenido.
+4. Guarda y ejecuta desde la interfaz.
+5. Revisa salida y errores devueltos por la API.
 
 ## 🔗 API
 
-Rutas disponibles:
+Endpoints principales:
 
 - `GET /`: interfaz principal.
-- `GET /api`: página de referencia de API.
-- `GET /gui/<subpath>`: recursos estáticos del frontend.
-- `POST /api/run`: ejecuta código. JSON: `{ "name": "file.asm", "code": "..." }`.
-- `POST /api/save`: guarda código. JSON: `{ "name": "file.asm", "code": "..." }`.
-- `GET /api/getcode?name=<archivo>`: obtiene el contenido de un archivo.
-- `POST /api/getcode?name=<archivo>`: también acepta el mismo acceso para compatibilidad.
-- `GET /api/initcodes`: lista los nombres disponibles en `codes/`.
+- `GET /api`: endpoint para referencia/archivo de API en frontend.
+- `POST /api/run`: ejecuta código.
+- `POST /api/save`: guarda código.
+- `GET|POST /api/getcode?name=<archivo>`: obtiene contenido.
+- `GET /api/initcodes`: lista entradas disponibles.
 - `GET /api/newcode?name=<archivo>`: crea una entrada vacía.
-- `GET /api/delcurr?name=<archivo>`: elimina el archivo actual.
+- `GET /api/delcurr?name=<archivo>`: elimina una entrada.
 
-Respuestas y validación:
+Formato de payload para `run` y `save`:
 
-- `success`: normalmente devuelve `{"status": "ok"}` o `{"status": "ok", "code": "..."}`.
-- `error`: devuelve `{"status": "fail", "message": "..."}` con el código HTTP correspondiente.
-- Los nombres de archivo se validan para evitar path traversal.
-- El servidor limita el payload JSON a 128 MB de código.
+```json
+{
+    "name": "archivo.c",
+    "code": "..."
+}
+```
 
 ## 🧰 Scripts
 
-- 🚀 `scripts/run.sh`: ejecuta la app con `python -OO` y luego llama a `scripts/clean`.
-- 🧹 `scripts/clean`: binario de limpieza.
-- 🧪 `scripts/clean.cpp`: fuente C++ del limpiador.
+- 🚀 `scripts/run.sh`: construye frontend generado, ejecuta `python -OO main.py` y limpia.
+- 🧱 `scripts/buildpage.sh`: regenera `guic/` desde `gui/`.
+- 🧪 `scripts/interpreter_extreme_tests.py`: pruebas de estrés del intérprete.
+- 🧹 `scripts/clean` y `scripts/clean.cpp`: utilidad de limpieza.
+- ▶️ `scripts/runsample.sh`: ejecución auxiliar de ejemplo.
 
-## 👨‍💻 Desarrollo
+## 🧪 Pruebas
 
-```bash
-source .venv/bin/activate
-python3 main.py
-```
+- La carpeta `tests/` existe, pero está vacía actualmente.
+- La validación principal de estrés está en `scripts/interpreter_extreme_tests.py`.
 
 ## 📚 Documentación
 
-- La documentación técnica está en `docs/`.
-- La referencia rápida de endpoints está en `gui/html/api.html`.
+- Documentación técnica y reportes en `docs/`.
+- Frontend legado disponible en `old_gui/`.
 
 ## ⚠️ Limitaciones actuales
 
-- Algunas salidas siguen orientadas a depuración.
-- Existen algunos bugs conocidos sin solucionar
-- No hay suite formal de tests automatizados en el repositorio.
+- Parte del proyecto sigue en estado experimental.
+- No hay una suite automatizada unificada dentro de `tests/`.
+- El lenguaje del intérprete no implementa aún todas las características de un lenguaje completo.
