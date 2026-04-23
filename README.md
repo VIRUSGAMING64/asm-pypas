@@ -31,60 +31,104 @@ Actualmente el proyecto permite:
 
 ```text
 asm-pypas/
-├── Dockerfile
-├── README.md
-├── l.py
-├── m.cpp
-├── main
-├── main.py
-├── requirements.txt
-├── codes/
-├── docs/
-│   ├── LangReference.tex
-│   └── informe.tex
-├── gui/
-│   ├── favicon.svg
-│   ├── html/
-│   │   ├── 404.html
-│   │   ├── api.html
-│   │   └── index.html
-│   ├── lib/
-│   │   ├── google-sans.ttf
-│   │   ├── tailwind.js
-│   │   ├── codemirror/
-│   │   └── iconfont/
-│   ├── main.js
-│   └── styles.css
-├── modules/
-│   ├── __init__.py
-│   ├── generic/
-│   │   └── utils.py
-│   ├── interpreter/
-│   │   ├── Exceptions.py
-│   │   ├── Expression.py
-│   │   ├── ExprParser.py
-│   │   ├── Tokens.py
-│   │   ├── builtin.py
-│   │   ├── debug.py
-│   │   ├── mainhandler.py
-│   │   ├── memory.py
-│   │   ├── structures.py
-│   │   ├── t_statics.py
-│   │   └── utils.py
-│   └── web/
-│       ├── __init__.py
-│       ├── index.py
-│       ├── api/
-│       │   └── endpoints.py
-│       └── core/
-│           ├── config.py
-│           ├── errors.py
-│           ├── saver.py
-│           └── utils.py
-└── scripts/
-	├── clean
-	├── clean.cpp
-	└── run.sh
+├── 📄 Dockerfile
+├── 📄 README.md
+├── 📄 main.py
+├── 📄 requirements.txt
+├── 📁 gui/
+│   ├── 📁 app/
+│   │   └── 📄 index.jsx
+│   ├── 📁 guihtml/
+│   │   ├── 📄 index.html
+│   │   └── 📁 _server/
+│   │       ├── 📁 sites/
+│   │       │   └── 📄 index.js
+│   │       └── 📁 src/
+│   │           ├── 📄 main.css
+│   │           ├── 📄 react-dom.js
+│   │           ├── 📄 react.js
+│   │           ├── 📄 styles.css
+│   │           └── 📁 libs/
+│   │               ├── 📄 tailwind.js
+│   │               ├── 📁 codemirror/
+│   │               └── 📁 iconfont/
+│   ├── 📁 lib/
+│   │   └── 📁 react-app/
+│   │       ├── 📄 jsconfig.json
+│   │       ├── 📄 layout.jsx
+│   │       └── 📄 package.json
+│   └── 📁 src/
+│       ├── 📄 main.css
+│       ├── 📄 styles.css
+│       └── 📁 libs/
+│           ├── 📄 tailwind.js
+│           ├── 📁 codemirror/
+│           │   ├── 📄 codemirror.min.css
+│           │   ├── 📄 codemirror.min.js
+│           │   ├── 📄 dracula.min.css
+│           │   ├── 📄 go.min.js
+│           │   └── 📄 python.min.js
+│           ├── 📁 iconfont/
+│           │   ├── 📄 _mixins.scss
+│           │   ├── 📄 _variables.scss
+│           │   ├── 📄 filled.css
+│           │   ├── 📄 filled.scss
+│           │   ├── 📄 material-icons.css
+│           │   ├── 📄 material-icons.scss
+│           │   ├── 📄 outlined.css
+│           │   ├── 📄 outlined.scss
+│           │   ├── 📄 round.css
+│           │   ├── 📄 round.scss
+│           │   ├── 📄 sharp.css
+│           │   ├── 📄 sharp.scss
+│           │   ├── 📄 two-tone.css
+│           │   └── 📄 two-tone.scss
+│           └── 📁 material-icons-main/
+│               ├── 📄 _config.yml
+│               ├── 📄 demo.html
+│               ├── 📄 index.d.ts
+│               ├── 📄 LICENSE
+│               ├── 📄 package.json
+│               ├── 📄 README.md
+│               ├── 📁 _data/
+│               │   ├── 📄 codepoints.json
+│               │   └── 📄 versions.json
+│               ├── 📁 css/ (estilos compilados)
+│               ├── 📁 iconfont/ (fuentes de iconos)
+│               └── 📁 scripts/ (herramientas de build)
+├── 📁 modules/
+│   ├── 📄 __init__.py
+│   ├── 📁 generic/
+│   │   └── 📄 utils.py
+│   ├── 📁 interpreter/
+│   │   ├── 📄 __init__.py
+│   │   ├── 📄 Exceptions.py
+│   │   ├── 📄 ExprParser.py
+│   │   ├── 📄 Lexer.py
+│   │   ├── 📄 Tokens.py
+│   │   ├── 📄 builtin.py
+│   │   ├── 📄 debug.py
+│   │   ├── 📄 mainhandler.py
+│   │   ├── 📄 memory.py
+│   │   ├── 📄 statics_values.py
+│   │   ├── 📄 structures.py
+│   │   └── 📄 utils.py
+│   └── 📁 web/
+│       ├── 📄 __init__.py
+│       ├── 📄 index.py
+│       ├── 📁 api/
+│       │   └── 📄 endpoints.py
+│       └── 📁 core/
+│           ├── 📄 config.py
+│           ├── 📄 errors.py
+│           ├── 📄 saver.py
+│           └── 📄 utils.py
+└── 📁 scripts/
+    ├── 📄 buildpage.sh
+    ├── 📄 clean
+    ├── 📄 clean.cpp
+    ├── 📄 run.sh
+    └── 📄 runsample.sh
 ```
 
 ## 📋 Requisitos

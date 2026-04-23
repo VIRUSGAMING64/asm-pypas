@@ -1,0 +1,27 @@
+* {
+    user-select: none;
+}
+
+@font-face {
+    font-family: 'google-sans';
+    src: url('/app/google-sans.ttf');
+}
+
+body {
+    font-family: 'google-sans';
+}
+
+body,
+body>div,
+.min-h-dvh {
+    min-height: 100dvh;
+}
+
+.font-bold {
+    font-family: 'google-sans-bold' !important;
+}
+
+body {
+    background: #000;
+    color: white;
+}

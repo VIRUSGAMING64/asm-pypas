@@ -1,2 +1,2 @@
-cd gui/lib/react-app/
-npm run build
+rm -r guic
+node build.js gui guic
