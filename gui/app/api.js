@@ -16,16 +16,28 @@ class API{
         return data["code"]
     }
     async initcodes(){
-        this.fetchapi("initcodes/")
+        return this.fetchapi("initcodes")
     }
-    async newcode(){
-        this.fetchapi("newcode/")
+    async newcode(name){
+        return this.fetchapi("newcode?name=" + encodeURIComponent(name))
     }
-    async delcode(){
-        this.fetchapi("delcode/")
+    async delcode(name){
+        return this.fetchapi("delcurr?name=" + encodeURIComponent(name))
     }
-    async save(){
-        this.fetchapi("save/")
+    async save(name, code){
+        const payload = {
+            name,
+            code
+        }
+
+        let response = await fetch("/api/save", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        })
+        return await response.json()
     }
     async run(name, code){
         

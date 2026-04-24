@@ -176,7 +176,6 @@ La IA se utilizó como apoyo. En concreto, se empleó para:
 - redactar y reorganizar partes de la documentación, incluyendo este README.
 - ayudar con el tailwind de algunos elementos frontend
 - ayudar a generar dockerfile
-- algunas sugerencias de código (Algunas reflejadas en el nombre de commits).
 
 ## ⚠️ Limitaciones actuales
 
